@@ -109,8 +109,15 @@ public:
 	void MUL();
 	void IMUL();
 	void INC();
+
 	void JMP();
-	//decide which conditional jumps to implement
+	void JE();
+	void JNE();
+	void JA();
+	void JB();
+	void JAE();
+	void JBE();
+
 	void MOVA();
 	void MOVB();
 	void MOVC();

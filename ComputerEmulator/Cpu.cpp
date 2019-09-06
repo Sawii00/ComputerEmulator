@@ -319,3 +319,35 @@ void Cpu::CMP() {
 void Cpu::JMP() {
 	pc = fetched;
 }
+void Cpu::JE() {
+	if (getFlag(Z))
+		pc = fetched;
+}
+void Cpu::JNE() {
+	if (!getFlag(Z))
+		pc = fetched;
+}
+void Cpu::JA() {
+	if (!getFlag(N) && !getFlag(Z))
+		pc = fetched;
+}
+void Cpu::JAE() {
+	if (!getFlag(N) || getFlag(Z))
+		pc = fetched;
+}
+void Cpu::JB() {
+	if (getFlag(N) && !getFlag(Z))
+		pc = fetched;
+}
+void Cpu::JBE() {
+	if (getFlag(N) || getFlag(Z))
+		pc = fetched;
+}
+
+//TO FINISH
+void Cpu::CALL() {
+	writeDWORD(sp++, ++pc);
+}
+
+void Cpu::RET() {
+}
