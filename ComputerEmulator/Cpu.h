@@ -6,17 +6,28 @@
 #include <functional>
 #include "Bus.h"
 
+/*
+
+- directly read 2 BYTES of data from pc and cast them into the curr_instruction var
+... in theory each segment should map into the correct place and we should have opcode for the first
+... 6 bits ecc...
+
+- single implementation of the instruction which acts based upon the current instruction form
+... in terms of operands
+
+http://www.c-jump.com/CIS77/CPU/x86/lecture.html
+
+*/
+
 class Bus;
 
-enum ADDRESSING_MODE {
-	IMM, IMP, ABS, ABS_EBI_OFFSET, PC_REL, REG_IND, REG
-};
-
 struct Instruction {
-	std::string mnemonic;
-	ADDRESSING_MODE addressing_mode;
-	std::function<void()> instruction_function;
-	BYTE cycles;
+	BYTE opcode : 6;
+	BYTE r_x : 1;
+	BYTE s : 1;
+	BYTE mod : 2;
+	BYTE reg : 3;
+	BYTE r_m : 3;
 };
 
 class Cpu
@@ -24,28 +35,118 @@ class Cpu
 private:
 	Bus* m_bus = nullptr;
 
-	DWORD eax = 0x00000000; //accumulator 0
-	DWORD ebx = 0x00000000; //base 1
-	DWORD ecx = 0x00000000; //counter  2
-	DWORD edx = 0x00000000; //data   3
+	//REGISTERS
 
-	DWORD ebi = 0x00000000; //addresses
+	union {
+		DWORD eax;
+
+		struct
+		{
+			WORD _unused;
+			WORD ax;
+		};
+
+		struct
+		{
+			WORD _unused;
+			BYTE ah;
+			BYTE al;
+		};
+	};
+	union {
+		DWORD ebx;
+
+		struct
+		{
+			WORD _unused;
+			WORD bx;
+		};
+
+		struct
+		{
+			WORD _unused;
+			BYTE bh;
+			BYTE bl;
+		};
+	};
+	union {
+		DWORD ecx;
+
+		struct
+		{
+			WORD _unused;
+			WORD cx;
+		};
+
+		struct
+		{
+			WORD _unused;
+			BYTE ch;
+			BYTE cl;
+		};
+	};
+	union {
+		DWORD edx;
+
+		struct
+		{
+			WORD _unused;
+			WORD dx;
+		};
+
+		struct
+		{
+			WORD _unused;
+			BYTE dh;
+			BYTE dl;
+		};
+	};
+	union {
+		DWORD esi;
+
+		struct
+		{
+			WORD _unused;
+			WORD si;
+		};
+	};
+	union {
+		DWORD ebi;
+
+		struct
+		{
+			WORD _unused;
+			WORD bi;
+		};
+	};
+	union {
+		DWORD esp;
+
+		struct
+		{
+			WORD _unused;
+			WORD sp;
+		};
+	};
+	union {
+		DWORD ebp;
+
+		struct
+		{
+			WORD _unused;
+			WORD bp;
+		};
+	};
 
 	DWORD pc = 0x00000000; //program counter
-	DWORD sp = 0x00000000; //stack pointer
-	DWORD bp = 0x00000000; //base pointer
 
-	BYTE status = 0x00;
+	BYTE flags = 0x00;
 
-	DWORD fetched = 0x00000000;
-	DWORD* curr_reg = nullptr;
+	///////////////////END REGISTERS
 
-	DWORD abs_address = 0x00000000;
-	DWORD rel_address = 0x00000000;
-	BYTE opcode = 0x00;
-	BYTE cycles = 0x00;
+	//////////////////////INTRUCTIONS VARIABLES
+	Instruction curr_instruction;
 
-	DWORD temp = 0x00000000;
 	//@TODO
 	//instruction list to be populated
 	std::array<Instruction, 256> m_instructions;
@@ -81,13 +182,9 @@ public:
 
 	BYTE read(DWORD address);
 	DWORD readDWORD(DWORD address);
-	DWORD getRegisterValue(BYTE id);
-	void setRegisterValue(BYTE id, DWORD val);
-	DWORD* getRegisterPointer(BYTE id);
+
 	ReturnCodes write(DWORD address, BYTE v);
 	ReturnCodes writeDWORD(DWORD address, DWORD v);
-
-	void handle_addressing_mode();
 
 	//instruction functions
 
@@ -102,6 +199,7 @@ public:
 	void CLI();
 	//compare
 	void CMP();
+
 	void DEC();
 	void DIV();
 	void IDIV();
@@ -118,10 +216,8 @@ public:
 	void JAE();
 	void JBE();
 
-	void MOVA();
-	void MOVB();
-	void MOVC();
-	void MOVD();
+	void MOV();
+
 	void NEG();
 	void NOT();
 	void OR();
