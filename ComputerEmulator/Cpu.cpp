@@ -50,20 +50,34 @@ BYTE Cpu::read(DWORD address)
 	return m_bus->read(address);
 }
 
+WORD Cpu::readWORD(DWORD address)
+{
+	return(read(address++) << 8 | read(address));
+}
+
 DWORD Cpu::readDWORD(DWORD address)
 {
-	return (read(address++) << 24 | read(address++) << 16 | read(address++) << 8 | read(address++));
+	return (read(address++) << 24 | read(address++) << 16 | read(address++) << 8 | read(address));
 }
 
 ReturnCodes Cpu::write(DWORD address, BYTE v)
 {
 	return m_bus->write(address, v);
 }
+//have no clue if that works
+ReturnCodes Cpu::writeWORD(DWORD address, WORD v)
+{
+	ReturnCodes stat = SUCCESS;
+	for (register int i = 0; i < 2 && stat != BAD_MEMORY_REQUEST; i++) {
+		stat = write(address, v >> (8 * i) & 0xff);
+	}
+	return stat;
+}
 //@TODO: check if this works
 ReturnCodes Cpu::writeDWORD(DWORD address, DWORD v)
 {
 	ReturnCodes stat = SUCCESS;
-	for (register int i = 0; i < 3 && stat != BAD_MEMORY_REQUEST; i++) {
+	for (register int i = 0; i < 4 && stat != BAD_MEMORY_REQUEST; i++) {
 		stat = write(address, v >> (8 * i) & 0xff);
 	}
 	return stat;
@@ -73,6 +87,14 @@ ReturnCodes Cpu::writeDWORD(DWORD address, DWORD v)
 void Cpu::fetch()
 {
 	//decode next instruction
+	//read next instruction from memory at program counter
+	curr_instruction = *(Instruction*)(pc++);
+	BYTE op = curr_instruction.getOpCode();
+	BYTE r = curr_instruction.getR_X();
+	BYTE s = curr_instruction.getS();
+	BYTE m = curr_instruction.getMod();
+	BYTE reg = curr_instruction.getReg();
+	BYTE r_ = curr_instruction.getR_M();
 }
 
 void Cpu::execute()

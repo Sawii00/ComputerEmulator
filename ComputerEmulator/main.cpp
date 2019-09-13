@@ -3,5 +3,8 @@
 #include "Bus.h"
 
 int main() {
-	return 0;
+	Cpu cpu;
+	cpu.test();
+
+	system("pause");
 }

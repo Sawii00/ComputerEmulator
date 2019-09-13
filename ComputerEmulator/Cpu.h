@@ -22,12 +22,29 @@ http://www.c-jump.com/CIS77/CPU/x86/lecture.html
 class Bus;
 
 struct Instruction {
-	BYTE opcode : 6;
-	BYTE r_x : 1;
-	BYTE s : 1;
-	BYTE mod : 2;
-	BYTE reg : 3;
-	BYTE r_m : 3;
+	WORD inst;
+
+	BYTE getOpCode() const {
+		return inst >> 0x2 & 0x3F;
+	}
+
+	BYTE getR_X() const {
+		return inst >> 0x1 & 0x01;
+	}
+
+	BYTE getS() const {
+		return inst & 0x1;
+	}
+
+	BYTE getMod()const {
+		return inst >> 0xE & 0x3;
+	}
+	BYTE getReg() const {
+		return inst >> 0xB & 0x7;
+	}
+	BYTE getR_M() const {
+		return inst >> 0x8 & 0x7;
+	}
 };
 
 class Cpu
@@ -138,7 +155,7 @@ private:
 		};
 	};
 
-	DWORD pc = 0x00000000; //program counter
+	WORD* pc = 0x00000000; //program counter
 
 	BYTE flags = 0x00;
 
@@ -177,13 +194,21 @@ public:
 	void fetch();
 	void execute();
 
+	void test() {
+		WORD inst = 0xC100;
+		pc = &inst;
+		fetch();
+	}
+
 	void interrupt();
 	void non_maskable_interrupt();
 
 	BYTE read(DWORD address);
 	DWORD readDWORD(DWORD address);
+	WORD readWORD(DWORD address);
 
 	ReturnCodes write(DWORD address, BYTE v);
+	ReturnCodes writeWORD(DWORD address, WORD v);
 	ReturnCodes writeDWORD(DWORD address, DWORD v);
 
 	//instruction functions

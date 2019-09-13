@@ -1,0 +1,8 @@
+﻿  Bus.cpp
+  class template variant is only available with C++17 or later.
+  Cpu.cpp
+  class template variant is only available with C++17 or later.
+  main.cpp
+  class template variant is only available with C++17 or later.
+  Generating Code...
+  ComputerEmulator.vcxproj -> C:\Dev\C++\ComputerEmulator\x64\Debug\ComputerEmulator.exe
