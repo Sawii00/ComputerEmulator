@@ -8,10 +8,6 @@
 
 /*
 
-- directly read 2 BYTES of data from pc and cast them into the curr_instruction var
-... in theory each segment should map into the correct place and we should have opcode for the first
-... 6 bits ecc...
-
 - single implementation of the instruction which acts based upon the current instruction form
 ... in terms of operands
 
@@ -23,6 +19,9 @@ class Bus;
 
 struct Instruction {
 	WORD inst;
+
+	Instruction(WORD word = 0)
+		: inst(word) {}
 
 	BYTE getOpCode() const {
 		return inst >> 0x2 & 0x3F;
@@ -128,12 +127,12 @@ private:
 		};
 	};
 	union {
-		DWORD ebi;
+		DWORD edi;
 
 		struct
 		{
 			WORD _unused;
-			WORD bi;
+			WORD di;
 		};
 	};
 	union {
@@ -155,7 +154,7 @@ private:
 		};
 	};
 
-	WORD* pc = 0x00000000; //program counter
+	WORD pc = 0x00000000; //program counter
 
 	BYTE flags = 0x00;
 
@@ -164,9 +163,11 @@ private:
 	//////////////////////INTRUCTIONS VARIABLES
 	Instruction curr_instruction;
 
+	std::variant<BYTE, WORD, DWORD> operand_register;
+
 	//@TODO
 	//instruction list to be populated
-	std::array<Instruction, 256> m_instructions;
+	//std::array<Instruction, 256> m_instructions;
 
 public:
 	enum FLAGS {
@@ -192,13 +193,16 @@ public:
 	void clock();
 
 	void fetch();
+	void decode();
 	void execute();
 
-	void test() {
+	/*void test() {
 		WORD inst = 0xC100;
-		pc = &inst;
+		writeWORD(0xFF, inst);
+		pc = 0xFF;
+
 		fetch();
-	}
+	}*/
 
 	void interrupt();
 	void non_maskable_interrupt();

@@ -1,6 +1,5 @@
 #pragma once
 
-#include <array>
 #include "Types.h"
 #include "Error.h"
 #include "Cpu.h"
@@ -13,7 +12,7 @@ private:
 
 	//devices
 	Cpu* m_cpu = nullptr;
-	std::array<BYTE, 1024> m_ram;
+	BYTE* m_ram = nullptr;
 
 public:
 	Bus();

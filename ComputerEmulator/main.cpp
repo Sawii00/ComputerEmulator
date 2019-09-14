@@ -3,8 +3,7 @@
 #include "Bus.h"
 
 int main() {
-	Cpu cpu;
-	cpu.test();
+	Bus bus;
 
 	system("pause");
 }

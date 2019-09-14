@@ -83,25 +83,130 @@ ReturnCodes Cpu::writeDWORD(DWORD address, DWORD v)
 	return stat;
 }
 
+void Cpu::decode() {
+	if (curr_instruction.getS()) {
+		//32 bit
+
+		BYTE reg = curr_instruction.getReg();
+		switch (reg)
+		{
+		case 0x0:
+		{
+			operand_register = eax;
+			break;
+		}
+		case 0x1:
+		{
+			operand_register = ecx;
+			break;
+		}
+		case 0x2:
+		{
+			operand_register = edx;
+			break;
+		}
+		case 0x3:
+		{
+			operand_register = ebx;
+			break;
+		}
+		case 0x4:
+		{
+			operand_register = esp;
+			break;
+		}
+		case 0x5:
+		{
+			operand_register = ebp;
+			break;
+		}
+		case 0x6:
+		{
+			operand_register = esi;
+			break;
+		}
+		case 0x7:
+		{
+			operand_register = edi;
+			break;
+		}
+		default:
+			throw "Invalid register";
+		}
+	}
+	else {
+		//8 bit
+		BYTE reg = curr_instruction.getReg();
+		switch (reg)
+		{
+		case 0x0:
+		{
+			operand_register = al;
+			break;
+		}
+		case 0x1:
+		{
+			operand_register = cl;
+			break;
+		}
+		case 0x2:
+		{
+			operand_register = dl;
+			break;
+		}
+		case 0x3:
+		{
+			operand_register = bl;
+			break;
+		}
+		case 0x4:
+		{
+			operand_register = ah;
+			break;
+		}
+		case 0x5:
+		{
+			operand_register = ch;
+			break;
+		}
+		case 0x6:
+		{
+			operand_register = dh;
+			break;
+		}
+		case 0x7:
+		{
+			operand_register = bh;
+			break;
+		}
+		default:
+			throw "Invalid register";
+		}
+	}
+}
+
 //the address to be read from is set by the handle_addressing_mode into abs_address o rel_address
 void Cpu::fetch()
 {
 	//decode next instruction
 	//read next instruction from memory at program counter
-	curr_instruction = *(Instruction*)(pc++);
-	BYTE op = curr_instruction.getOpCode();
+	curr_instruction = Instruction(readWORD(pc++));
+	/*BYTE op = curr_instruction.getOpCode();
 	BYTE r = curr_instruction.getR_X();
 	BYTE s = curr_instruction.getS();
 	BYTE m = curr_instruction.getMod();
 	BYTE reg = curr_instruction.getReg();
-	BYTE r_ = curr_instruction.getR_M();
+	BYTE r_ = curr_instruction.getR_M();*/
+
+	decode();
 }
 
 void Cpu::execute()
 {
 }
 
-void Cpu::AND() {}
+void Cpu::AND() {
+}
 
 void Cpu::OR() {}
 
