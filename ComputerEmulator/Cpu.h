@@ -5,17 +5,28 @@
 #include <string>
 #include <functional>
 #include "Bus.h"
+#include <array>
 
 /*
+- INTEL XED
 
 - single implementation of the instruction which acts based upon the current instruction form
 ... in terms of operands
+
+- implement segment registers
+- continue instruction table
 
 http://www.c-jump.com/CIS77/CPU/x86/lecture.html
 
 */
 
 class Bus;
+
+struct DisassembledInstruction {
+	std::string name;
+	std::function<void()> instruction_function;
+	BYTE cycles;
+};
 
 struct Instruction {
 	WORD inst;
@@ -28,7 +39,7 @@ struct Instruction {
 	}
 
 	BYTE getR_X() const {
-		return inst >> 0x1 & 0x01;
+		return inst >> 0x1 & 0x1;
 	}
 
 	BYTE getS() const {
@@ -43,6 +54,13 @@ struct Instruction {
 	}
 	BYTE getR_M() const {
 		return inst >> 0x8 & 0x7;
+	}
+
+	BYTE getOpCodeByte() const {
+		return inst >> 0x8 & 0xFF;
+	}
+	BYTE getModRMByte() const {
+		return inst & 0xFF;
 	}
 };
 
@@ -163,11 +181,22 @@ private:
 	//////////////////////INTRUCTIONS VARIABLES
 	Instruction curr_instruction;
 
-	std::variant<BYTE, WORD, DWORD> operand_register;
+	std::variant<BYTE*, WORD*, DWORD*> operand_register;
+
+	std::variant<BYTE*, WORD*, DWORD*> second_operand;
+
+	bool sib_enabled = false;
 
 	//@TODO
 	//instruction list to be populated
-	//std::array<Instruction, 256> m_instructions;
+	std::array<DisassembledInstruction, 256> m_instruction_list;
+
+	void computeSecondOperandMod0();
+	void computeSecondOperandMod1();
+	void computeSecondOperandMod2();
+	void computeSecondOperandMod3();
+
+	void computeFirstOperand();
 
 public:
 	enum FLAGS {

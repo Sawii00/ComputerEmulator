@@ -8,7 +8,7 @@ Cpu::Cpu()
 	ecx = 0x00;
 	edx = 0x00;
 	esi = 0x00;
-	ebi = 0x00;
+	edi = 0x00;
 	esp = 0x00;
 	ebp = 0x00;
 }
@@ -83,7 +83,49 @@ ReturnCodes Cpu::writeDWORD(DWORD address, DWORD v)
 	return stat;
 }
 
-void Cpu::decode() {
+/*//COMPUTE SECOND OPERAND
+
+void Cpu::computeSecondOperandMod0() {
+	BYTE r_m = curr_instruction.getR_M();
+
+	switch (r_m)
+	{
+	case 0x00:
+	{
+		if (curr_instruction.getS()) {
+			second_operand = &eax;
+		}
+		else {
+			second_operand = &a
+		}
+	}
+	case 0x01:
+	{}
+	case 0x02:
+	{}
+	case 0x03:
+	{}
+	case 0x04:
+	{}
+	case 0x05:
+	{}
+	case 0x06:
+	{}
+	case 0x07:
+	{}
+
+	default:
+		throw "Invalid r_m val";
+	}
+}
+void Cpu::computeSecondOperandMod1() {
+}
+void Cpu::computeSecondOperandMod2() {
+}
+void Cpu::computeSecondOperandMod3() {
+}
+
+void Cpu::computeFirstOperand() {
 	if (curr_instruction.getS()) {
 		//32 bit
 
@@ -92,42 +134,42 @@ void Cpu::decode() {
 		{
 		case 0x0:
 		{
-			operand_register = eax;
+			operand_register = &eax;
 			break;
 		}
 		case 0x1:
 		{
-			operand_register = ecx;
+			operand_register = &ecx;
 			break;
 		}
 		case 0x2:
 		{
-			operand_register = edx;
+			operand_register = &edx;
 			break;
 		}
 		case 0x3:
 		{
-			operand_register = ebx;
+			operand_register = &ebx;
 			break;
 		}
 		case 0x4:
 		{
-			operand_register = esp;
+			operand_register = &esp;
 			break;
 		}
 		case 0x5:
 		{
-			operand_register = ebp;
+			operand_register = &ebp;
 			break;
 		}
 		case 0x6:
 		{
-			operand_register = esi;
+			operand_register = &esi;
 			break;
 		}
 		case 0x7:
 		{
-			operand_register = edi;
+			operand_register = &edi;
 			break;
 		}
 		default:
@@ -141,42 +183,42 @@ void Cpu::decode() {
 		{
 		case 0x0:
 		{
-			operand_register = al;
+			operand_register = &al;
 			break;
 		}
 		case 0x1:
 		{
-			operand_register = cl;
+			operand_register = &cl;
 			break;
 		}
 		case 0x2:
 		{
-			operand_register = dl;
+			operand_register = &dl;
 			break;
 		}
 		case 0x3:
 		{
-			operand_register = bl;
+			operand_register = &bl;
 			break;
 		}
 		case 0x4:
 		{
-			operand_register = ah;
+			operand_register = &ah;
 			break;
 		}
 		case 0x5:
 		{
-			operand_register = ch;
+			operand_register = &ch;
 			break;
 		}
 		case 0x6:
 		{
-			operand_register = dh;
+			operand_register = &dh;
 			break;
 		}
 		case 0x7:
 		{
-			operand_register = bh;
+			operand_register = &bh;
 			break;
 		}
 		default:
@@ -185,7 +227,52 @@ void Cpu::decode() {
 	}
 }
 
-//the address to be read from is set by the handle_addressing_mode into abs_address o rel_address
+void Cpu::decode() {
+	computeFirstOperand();
+
+	BYTE mod = curr_instruction.getMod();
+
+	switch (mod)
+	{
+	case 0x00:
+	{
+		//register indirect
+		computeSecondOperandMod0();
+
+		break;
+	}
+
+	case 0x01:
+	{
+		//8 bit displacement
+		computeSecondOperandMod1();
+
+		break;
+	}
+
+	case 0x02:
+	{
+		//32 bit displacement
+		computeSecondOperandMod2();
+
+		break;
+	}
+
+	case 0x03:
+	{
+		//register direct
+
+		computeSecondOperandMod3();
+
+		break;
+	}
+
+	default:
+		throw "Invalid Mode";
+	}
+}
+*/
+
 void Cpu::fetch()
 {
 	//decode next instruction
@@ -198,7 +285,7 @@ void Cpu::fetch()
 	BYTE reg = curr_instruction.getReg();
 	BYTE r_ = curr_instruction.getR_M();*/
 
-	decode();
+	m_instruction_list[curr_instruction.getOpCodeByte()].instruction_function();
 }
 
 void Cpu::execute()

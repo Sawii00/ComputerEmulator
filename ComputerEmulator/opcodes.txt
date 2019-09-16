@@ -1,0 +1,6 @@
+Add,ADD,1
+Add,ADD,1
+Add,ADD,1
+Add,ADD,1
+Add_rax,ADD_RAX,1
+Add_rax,ADD_RAX,1
