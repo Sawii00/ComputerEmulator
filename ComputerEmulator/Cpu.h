@@ -172,9 +172,16 @@ private:
 		};
 	};
 
-	WORD pc = 0x00000000; //program counter
+	DWORD pc = 0x00000000; //program counter.
 
 	BYTE flags = 0x00;
+
+	WORD cs = 0x0000; //code
+	WORD ds = 0x0000; //data
+	WORD ss = 0x0000; //stack
+	WORD es = 0x0000; //extra
+	WORD fs = 0x0000;
+	WORD gs = 0x0000;
 
 	///////////////////END REGISTERS
 
