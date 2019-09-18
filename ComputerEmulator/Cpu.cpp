@@ -12,7 +12,7 @@ Cpu::Cpu()
 	esp = 0x00;
 	ebp = 0x00;
 
-	//segment
+	m_instruction_list[0] = DisassembledInstruction(std::string("ADD"), &ADD, 1);
 }
 
 Cpu::~Cpu()
@@ -286,12 +286,166 @@ void Cpu::fetch()
 	BYTE m = curr_instruction.getMod();
 	BYTE reg = curr_instruction.getReg();
 	BYTE r_ = curr_instruction.getR_M();*/
-
-	m_instruction_list[curr_instruction.getOpCodeByte()].instruction_function();
 }
 
 void Cpu::execute()
 {
+	(this->*m_instruction_list[curr_instruction.getOpCodeByte()].instruction_function)();
 }
 
 //instructions
+
+void Cpu::ADD()
+{
+	if (curr_instruction.getS()) {
+		//32-16 bit
+		//@TODO(sawii) check if its 16 via prefixes
+
+		DWORD* first;
+		DWORD* second;
+
+		BYTE _mod = curr_instruction.getMod();
+		switch (_mod)
+		{
+		case 0x0:
+		{
+			break;
+		}
+		case 0x1:
+		{
+			break;
+		}
+		case 0x2:
+		{
+			break;
+		}
+		case 0x3:
+		{
+			//r_m is register
+			BYTE _reg = curr_instruction.getReg();
+
+			switch (_reg)
+			{
+			case 0x0:
+			{
+				first = &eax;
+				break;
+			}
+			case 0x1:
+			{
+				first = &ecx;
+
+				break;
+			}
+			case 0x2:
+			{
+				first = &edx;
+
+				break;
+			}
+			case 0x3:
+			{
+				first = &ebx;
+
+				break;
+			}
+			case 0x4:
+			{
+				first = &esp;
+
+				break;
+			}
+			case 0x5:
+			{
+				first = &ebp;
+
+				break;
+			}
+			case 0x6:
+			{
+				first = &esi;
+
+				break;
+			}
+			case 0x7:
+			{
+				first = &edi;
+
+				break;
+			}
+
+			default:
+				throw "Invalid Reg";
+			}
+			BYTE _r_m = curr_instruction.getR_M();
+
+			switch (_r_m)
+			{
+			case 0x0:
+			{
+				second = &eax;
+				break;
+			}
+			case 0x1:
+			{
+				second = &ecx;
+
+				break;
+			}
+			case 0x2:
+			{
+				second = &edx;
+
+				break;
+			}
+			case 0x3:
+			{
+				second = &ebx;
+
+				break;
+			}
+			case 0x4:
+			{
+				second = &esp;
+
+				break;
+			}
+			case 0x5:
+			{
+				second = &ebp;
+
+				break;
+			}
+			case 0x6:
+			{
+				second = &esi;
+
+				break;
+			}
+			case 0x7:
+			{
+				second = &edi;
+
+				break;
+			}
+
+			default:
+				throw "Invalid r_m";
+			}
+			break;
+		}
+
+		default:
+			throw "Invalid Mode";
+		}
+		if (curr_instruction.getR_X()) {
+			*second += *first;
+		}
+		else {
+			*first += *second;
+		}
+	}
+	else {
+		//8 bit
+	}
+}

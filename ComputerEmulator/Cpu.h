@@ -3,7 +3,6 @@
 #include "Error.h"
 #include "Types.h"
 #include <string>
-#include <functional>
 #include "Bus.h"
 #include <array>
 
@@ -23,8 +22,11 @@ http://www.c-jump.com/CIS77/CPU/x86/lecture.html
 class Bus;
 
 struct DisassembledInstruction {
+	DisassembledInstruction(std::string n = "", void(*f)(void) = nullptr, BYTE c = 0)
+		:name(n), instruction_function(f), cycles(c) {};
+
 	std::string name;
-	std::function<void()> instruction_function;
+	void(*instruction_function)(void) = nullptr;
 	BYTE cycles;
 };
 
@@ -198,13 +200,6 @@ private:
 	//instruction list to be populated
 	std::array<DisassembledInstruction, 256> m_instruction_list;
 
-	void computeSecondOperandMod0();
-	void computeSecondOperandMod1();
-	void computeSecondOperandMod2();
-	void computeSecondOperandMod3();
-
-	void computeFirstOperand();
-
 public:
 	enum FLAGS {
 		C = 1 << 0,
@@ -232,13 +227,16 @@ public:
 	void decode();
 	void execute();
 
-	/*void test() {
+	void test() {
+		cl = 2;
+		al = 3;
 		WORD inst = 0xC100;
 		writeWORD(0xFF, inst);
 		pc = 0xFF;
 
 		fetch();
-	}*/
+		execute();
+	}
 
 	void interrupt();
 	void non_maskable_interrupt();
@@ -254,46 +252,68 @@ public:
 	//instruction functions
 
 	void ADD();
-	//add with carry
-	void ADC();
-	void AND();
-	void CALL();
-	//clear carry bit
-	void CLC();
-	//clear interrupt enable bit
-	void CLI();
-	//compare
-	void CMP();
-
-	void DEC();
-	void DIV();
-	void IDIV();
-	void HLT();
-	void MUL();
-	void IMUL();
-	void INC();
-
-	void JMP();
-	void JE();
-	void JNE();
-	void JA();
-	void JB();
-	void JAE();
-	void JBE();
-
-	void MOV();
-
-	void NEG();
-	void NOT();
+	void ADD_RAX();
+	void PUSH_ES();
+	void POP_ES();
 	void OR();
-	void POP();
-	void PUSH();
-	//rotations
-	void RET();
-	//set carry flag
-	void STC();
-	//set interrupt enable flag
-	void STI();
+	void OR_RAX();
+	void PUSH_CS();
+	void ADC();
+	void ADC_RAX();
+	void PUSH_SS();
+	void POP_SS();
+	void SBB();
+	void SBB_RAX();
+	void PUSH_DS();
+	void POP_DS();
+	void AND();
+	void AND_RAX();
+	void DAA();
 	void SUB();
+	void SUB_RAX();
+	void DAS();
 	void XOR();
+	void XOR_RAX();
+	void AAA();
+	void CMP();
+	void CMP_RAX();
+	void AAS();
+	void INC_EAX();
+	void INC_ECX();
+	void INC_EDX();
+	void INC_EBX();
+	void INC_ESP();
+	void INC_EBP();
+	void INC_ESI();
+	void INC_EDI();
+	void DEC_EAX();
+	void DEC_ECX();
+	void DEC_EDX();
+	void DEC_EBX();
+	void DEC_ESP();
+	void DEC_EBP();
+	void DEC_ESI();
+	void DEC_EDI();
+	void PUSH_EAX();
+	void PUSH_ECX();
+	void PUSH_EDX();
+	void PUSH_EBX();
+	void PUSH_ESP();
+	void PUSH_EBP();
+	void PUSH_ESI();
+	void PUSH_EDI();
+	void POP_EAX();
+	void POP_ECX();
+	void POP_EDX();
+	void POP_EBX();
+	void POP_ESP();
+	void POP_EBP();
+	void POP_ESI();
+	void POP_EDI();
+	void PUSHA();
+	void POPA();
+	void BOUND();
+	void PUSH_IMM();
+	void IMUL_THREE_OPS_16_32();
+	void IMUL_THREE_OPS_8();
 };
