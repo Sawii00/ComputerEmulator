@@ -6,7 +6,7 @@ Bus::Bus()
 	m_cpu->attachBus(this);
 	m_ram = new BYTE[0x400];
 	memset(m_ram, 0, sizeof(BYTE) * 0x400);
-	//m_cpu->test();
+	m_cpu->test();
 }
 
 Bus::~Bus()

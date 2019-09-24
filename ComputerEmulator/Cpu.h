@@ -5,6 +5,7 @@
 #include <string>
 #include "Bus.h"
 #include <array>
+#include <functional>
 
 /*
 - INTEL XED
@@ -20,13 +21,14 @@ http://www.c-jump.com/CIS77/CPU/x86/lecture.html
 */
 
 class Bus;
+class Cpu;
 
 struct DisassembledInstruction {
-	DisassembledInstruction(std::string n = "", void(*f)(void) = nullptr, BYTE c = 0)
+	DisassembledInstruction(std::string n = "", std::function<void(Cpu*)>f = nullptr, BYTE c = 0)
 		:name(n), instruction_function(f), cycles(c) {};
 
 	std::string name;
-	void(*instruction_function)(void) = nullptr;
+	std::function<void(Cpu*)>instruction_function;
 	BYTE cycles;
 };
 
@@ -230,7 +232,7 @@ public:
 	void test() {
 		cl = 2;
 		al = 3;
-		WORD inst = 0xC100;
+		WORD inst = 0xC101;
 		writeWORD(0xFF, inst);
 		pc = 0xFF;
 

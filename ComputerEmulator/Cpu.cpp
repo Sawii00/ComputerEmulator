@@ -12,7 +12,7 @@ Cpu::Cpu()
 	esp = 0x00;
 	ebp = 0x00;
 
-	m_instruction_list[0] = DisassembledInstruction(std::string("ADD"), &ADD, 1);
+	m_instruction_list[0] = DisassembledInstruction(std::string("ADD"), &Cpu::ADD, (BYTE)1);
 }
 
 Cpu::~Cpu()
@@ -71,7 +71,7 @@ ReturnCodes Cpu::writeWORD(DWORD address, WORD v)
 {
 	ReturnCodes stat = SUCCESS;
 	for (register int i = 0; i < 2 && stat != BAD_MEMORY_REQUEST; i++) {
-		stat = write(address, v >> (8 * i) & 0xff);
+		stat = write(address + i, v >> (8 * i) & 0xff);
 	}
 	return stat;
 }
@@ -80,7 +80,7 @@ ReturnCodes Cpu::writeDWORD(DWORD address, DWORD v)
 {
 	ReturnCodes stat = SUCCESS;
 	for (register int i = 0; i < 4 && stat != BAD_MEMORY_REQUEST; i++) {
-		stat = write(address, v >> (8 * i) & 0xff);
+		stat = write(address + i, v >> (8 * i) & 0xff);
 	}
 	return stat;
 }
@@ -288,9 +288,12 @@ void Cpu::fetch()
 	BYTE r_ = curr_instruction.getR_M();*/
 }
 
+
+problema opcode
 void Cpu::execute()
 {
-	(this->*m_instruction_list[curr_instruction.getOpCodeByte()].instruction_function)();
+	BYTE test = curr_instruction.getOpCode();
+	(m_instruction_list[curr_instruction.getOpCode()].instruction_function)(this);
 }
 
 //instructions
@@ -301,8 +304,8 @@ void Cpu::ADD()
 		//32-16 bit
 		//@TODO(sawii) check if its 16 via prefixes
 
-		DWORD* first;
-		DWORD* second;
+		DWORD* first = nullptr;
+		DWORD* second = nullptr;
 
 		BYTE _mod = curr_instruction.getMod();
 		switch (_mod)
