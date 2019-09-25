@@ -288,11 +288,8 @@ void Cpu::fetch()
 	BYTE r_ = curr_instruction.getR_M();*/
 }
 
-
-problema opcode
 void Cpu::execute()
 {
-	BYTE test = curr_instruction.getOpCode();
 	(m_instruction_list[curr_instruction.getOpCode()].instruction_function)(this);
 }
 

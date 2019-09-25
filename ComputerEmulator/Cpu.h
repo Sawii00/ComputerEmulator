@@ -1,5 +1,4 @@
 #pragma once
-#include <variant>
 #include "Error.h"
 #include "Types.h"
 #include <string>
@@ -39,25 +38,31 @@ struct Instruction {
 		: inst(word) {}
 
 	BYTE getOpCode() const {
-		return inst >> 0x2 & 0x3F;
+		return inst >> 0xA & 0x3F;
+		//return inst >> 0x2 & 0x3F;
 	}
 
 	BYTE getR_X() const {
-		return inst >> 0x1 & 0x1;
+		return inst >> 0x9 & 0x1;
+		//return inst >> 0x1 & 0x1;
 	}
 
 	BYTE getS() const {
-		return inst & 0x1;
+		return inst >> 0x8 & 0x1;
+		//return inst & 0x1;
 	}
 
 	BYTE getMod()const {
-		return inst >> 0xE & 0x3;
+		return inst >> 0x6 & 0x3;
+		//return inst >> 0xE & 0x3;
 	}
 	BYTE getReg() const {
-		return inst >> 0xB & 0x7;
+		return inst >> 0x3 & 0x7;
+		//return inst >> 0xB & 0x7;
 	}
 	BYTE getR_M() const {
-		return inst >> 0x8 & 0x7;
+		return inst & 0x7;
+		//return inst >> 0x8 & 0x7;
 	}
 
 	BYTE getOpCodeByte() const {
@@ -191,10 +196,6 @@ private:
 
 	//////////////////////INTRUCTIONS VARIABLES
 	Instruction curr_instruction;
-
-	std::variant<BYTE*, WORD*, DWORD*> operand_register;
-
-	std::variant<BYTE*, WORD*, DWORD*> second_operand;
 
 	bool sib_enabled = false;
 
