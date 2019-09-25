@@ -98,10 +98,10 @@ private:
 			BYTE al;
 		} bytes;
 	} EAX;
-	DWORD eax = EAX.eax;
-	WORD ax = EAX.word.ax;
-	BYTE ah = EAX.bytes.ah;
-	BYTE al = EAX.bytes.al;
+	DWORD& eax = EAX.eax;
+	WORD& ax = EAX.word.ax;
+	BYTE& ah = EAX.bytes.ah;
+	BYTE& al = EAX.bytes.al;
 
 	union {
 		DWORD ebx;
@@ -119,10 +119,10 @@ private:
 			BYTE bl;
 		}bytes;
 	} EBX;
-	DWORD ebx = EBX.ebx;
-	WORD bx = EBX.word.bx;
-	BYTE bh = EBX.bytes.bh;
-	BYTE bl = EBX.bytes.bl;
+	DWORD& ebx = EBX.ebx;
+	WORD& bx = EBX.word.bx;
+	BYTE& bh = EBX.bytes.bh;
+	BYTE& bl = EBX.bytes.bl;
 	union {
 		DWORD ecx;
 
@@ -139,10 +139,10 @@ private:
 			BYTE cl;
 		}bytes;
 	}ECX;
-	DWORD ecx = ECX.ecx;
-	WORD cx = ECX.word.cx;
-	BYTE ch = ECX.bytes.ch;
-	BYTE cl = ECX.bytes.cl;
+	DWORD& ecx = ECX.ecx;
+	WORD& cx = ECX.word.cx;
+	BYTE& ch = ECX.bytes.ch;
+	BYTE& cl = ECX.bytes.cl;
 	union {
 		DWORD edx;
 
@@ -159,10 +159,10 @@ private:
 			BYTE dl;
 		}bytes;
 	}EDX;
-	DWORD edx = EDX.edx;
-	WORD dx = EDX.word.dx;
-	BYTE dh = EDX.bytes.dh;
-	BYTE dl = EDX.bytes.dl;
+	DWORD& edx = EDX.edx;
+	WORD& dx = EDX.word.dx;
+	BYTE& dh = EDX.bytes.dh;
+	BYTE& dl = EDX.bytes.dl;
 	union {
 		DWORD esi;
 
@@ -172,8 +172,8 @@ private:
 			WORD si;
 		} word;
 	}ESI;
-	DWORD esi = ESI.esi;
-	WORD si = ESI.word.si;
+	DWORD& esi = ESI.esi;
+	WORD& si = ESI.word.si;
 	union {
 		DWORD edi;
 
@@ -183,8 +183,8 @@ private:
 			WORD di;
 		} word;
 	}EDI;
-	DWORD edi = EDI.edi;
-	WORD di = EDI.word.di;
+	DWORD& edi = EDI.edi;
+	WORD& di = EDI.word.di;
 	union {
 		DWORD esp;
 
@@ -194,8 +194,8 @@ private:
 			WORD sp;
 		} word;
 	}ESP;
-	DWORD esp = ESP.esp;
-	WORD sp = ESP.word.sp;
+	DWORD& esp = ESP.esp;
+	WORD& sp = ESP.word.sp;
 	union {
 		DWORD ebp;
 
@@ -205,8 +205,8 @@ private:
 			WORD bp;
 		} word;
 	}EBP;
-	DWORD ebp = EBP.ebp;
-	WORD bp = EBP.word.bp;
+	DWORD& ebp = EBP.ebp;
+	WORD& bp = EBP.word.bp;
 
 	DWORD pc = 0x00000000; //program counter.
 
@@ -257,7 +257,7 @@ public:
 	void decode();
 	void execute();
 
-    void print_registers();
+	void print_registers();
 
 	void test() {
 		cl = 2;
@@ -266,14 +266,12 @@ public:
 		writeWORD(0xFF, inst);
 		pc = 0xFF;
 
-        print_registers();
+		print_registers();
 
 		fetch();
 		execute();
-        print_registers();	
-
-    
-    }
+		print_registers();
+	}
 	void interrupt();
 	void non_maskable_interrupt();
 
