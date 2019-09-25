@@ -87,19 +87,19 @@ private:
 		{
 			WORD _unused;
 			WORD ax;
-		};
+		} word;
 
 		struct
 		{
 			WORD _unused;
 			BYTE ah;
 			BYTE al;
-		};
+		} bytes;
 	} EAX;
 	DWORD eax = EAX.eax;
-	WORD ax = EAX.ax;
-	BYTE ah = EAX.ah;
-	BYTE al = EAX.al;
+	WORD ax = EAX.word.ax;
+	BYTE ah = EAX.bytes.ah;
+	BYTE al = EAX.bytes.al;
 
 	union {
 		DWORD ebx;
@@ -108,19 +108,19 @@ private:
 		{
 			WORD _unused;
 			WORD bx;
-		};
+		} word;
 
 		struct
 		{
 			WORD _unused;
 			BYTE bh;
 			BYTE bl;
-		};
+		}bytes;
 	} EBX;
 	DWORD ebx = EBX.ebx;
-	WORD bx = EBX.bx;
-	BYTE bh = EBX.bh;
-	BYTE bl = EBX.bl;
+	WORD bx = EBX.word.bx;
+	BYTE bh = EBX.bytes.bh;
+	BYTE bl = EBX.bytes.bl;
 	union {
 		DWORD ecx;
 
@@ -128,19 +128,19 @@ private:
 		{
 			WORD _unused;
 			WORD cx;
-		};
+		} word;
 
 		struct
 		{
 			WORD _unused;
 			BYTE ch;
 			BYTE cl;
-		};
+		}bytes;
 	}ECX;
 	DWORD ecx = ECX.ecx;
-	WORD cx = ECX.cx;
-	BYTE ch = ECX.ch;
-	BYTE cl = ECX.cl;
+	WORD cx = ECX.word.cx;
+	BYTE ch = ECX.bytes.ch;
+	BYTE cl = ECX.bytes.cl;
 	union {
 		DWORD edx;
 
@@ -148,19 +148,19 @@ private:
 		{
 			WORD _unused;
 			WORD dx;
-		};
+		} word;
 
 		struct
 		{
 			WORD _unused;
 			BYTE dh;
 			BYTE dl;
-		};
+		}bytes;
 	}EDX;
 	DWORD edx = EDX.edx;
-	WORD dx = EDX.dx;
-	BYTE dh = EDX.dh;
-	BYTE dl = EDX.dl;
+	WORD dx = EDX.word.dx;
+	BYTE dh = EDX.bytes.dh;
+	BYTE dl = EDX.bytes.dl;
 	union {
 		DWORD esi;
 
@@ -168,10 +168,10 @@ private:
 		{
 			WORD _unused;
 			WORD si;
-		};
+		} word;
 	}ESI;
 	DWORD esi = ESI.esi;
-	WORD si = ESI.si;
+	WORD si = ESI.word.si;
 	union {
 		DWORD edi;
 
@@ -179,10 +179,10 @@ private:
 		{
 			WORD _unused;
 			WORD di;
-		};
+		} word;
 	}EDI;
 	DWORD edi = EDI.edi;
-	WORD di = EDI.di;
+	WORD di = EDI.word.di;
 	union {
 		DWORD esp;
 
@@ -190,10 +190,10 @@ private:
 		{
 			WORD _unused;
 			WORD sp;
-		};
+		} word;
 	}ESP;
 	DWORD esp = ESP.esp;
-	WORD sp = ESP.sp;
+	WORD sp = ESP.word.sp;
 	union {
 		DWORD ebp;
 
@@ -201,10 +201,10 @@ private:
 		{
 			WORD _unused;
 			WORD bp;
-		};
+		} word;
 	}EBP;
 	DWORD ebp = EBP.ebp;
-	WORD bp = EBP.bp;
+	WORD bp = EBP.word.bp;
 
 	DWORD pc = 0x00000000; //program counter.
 
