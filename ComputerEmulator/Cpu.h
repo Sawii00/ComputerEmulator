@@ -5,6 +5,8 @@
 #include "Bus.h"
 #include <array>
 #include <functional>
+#include <cstring>
+#include <iostream>
 
 /*
 - INTEL XED
@@ -255,6 +257,8 @@ public:
 	void decode();
 	void execute();
 
+    void print_registers();
+
 	void test() {
 		cl = 2;
 		al = 3;
@@ -262,10 +266,14 @@ public:
 		writeWORD(0xFF, inst);
 		pc = 0xFF;
 
+        print_registers();
+
 		fetch();
 		execute();
-	}
+        print_registers();	
 
+    
+    }
 	void interrupt();
 	void non_maskable_interrupt();
 

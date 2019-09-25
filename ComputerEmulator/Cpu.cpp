@@ -85,6 +85,21 @@ ReturnCodes Cpu::writeDWORD(DWORD address, DWORD v)
 	return stat;
 }
 
+void Cpu::print_registers(){
+
+    std::cout<<"eax: "<<eax<<'\n';
+    std::cout<<"ebx: "<<ebx<<'\n';
+
+    std::cout<<"ecx: "<<ecx<<'\n';
+    std::cout<<"edx: "<<edx<<'\n';
+    std::cout<<"esi: "<<esi<<'\n';
+    std::cout<<"edi: "<<edi<<'\n';
+    std::cout<<"esp: "<<esp<<'\n';
+    std::cout<<"ebp: "<<ebp<<'\n';
+
+}
+
+
 /*//COMPUTE SECOND OPERAND
 
 void Cpu::computeSecondOperandMod0() {
