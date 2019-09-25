@@ -95,7 +95,12 @@ private:
 			BYTE ah;
 			BYTE al;
 		};
-	};
+	} EAX;
+	DWORD eax = EAX.eax;
+	WORD ax = EAX.ax;
+	BYTE ah = EAX.ah;
+	BYTE al = EAX.al;
+
 	union {
 		DWORD ebx;
 
@@ -111,7 +116,11 @@ private:
 			BYTE bh;
 			BYTE bl;
 		};
-	};
+	} EBX;
+	DWORD ebx = EBX.ebx;
+	WORD bx = EBX.bx;
+	BYTE bh = EBX.bh;
+	BYTE bl = EBX.bl;
 	union {
 		DWORD ecx;
 
@@ -127,7 +136,11 @@ private:
 			BYTE ch;
 			BYTE cl;
 		};
-	};
+	}ECX;
+	DWORD ecx = ECX.ecx;
+	WORD cx = ECX.cx;
+	BYTE ch = ECX.ch;
+	BYTE cl = ECX.cl;
 	union {
 		DWORD edx;
 
@@ -143,7 +156,11 @@ private:
 			BYTE dh;
 			BYTE dl;
 		};
-	};
+	}EDX;
+	DWORD edx = EDX.edx;
+	WORD dx = EDX.dx;
+	BYTE dh = EDX.dh;
+	BYTE dl = EDX.dl;
 	union {
 		DWORD esi;
 
@@ -152,7 +169,9 @@ private:
 			WORD _unused;
 			WORD si;
 		};
-	};
+	}ESI;
+	DWORD esi = ESI.esi;
+	WORD si = ESI.si;
 	union {
 		DWORD edi;
 
@@ -161,7 +180,9 @@ private:
 			WORD _unused;
 			WORD di;
 		};
-	};
+	}EDI;
+	DWORD edi = EDI.edi;
+	WORD di = EDI.di;
 	union {
 		DWORD esp;
 
@@ -170,7 +191,9 @@ private:
 			WORD _unused;
 			WORD sp;
 		};
-	};
+	}ESP;
+	DWORD esp = ESP.esp;
+	WORD sp = ESP.sp;
 	union {
 		DWORD ebp;
 
@@ -179,7 +202,9 @@ private:
 			WORD _unused;
 			WORD bp;
 		};
-	};
+	}EBP;
+	DWORD ebp = EBP.ebp;
+	WORD bp = EBP.bp;
 
 	DWORD pc = 0x00000000; //program counter.
 
