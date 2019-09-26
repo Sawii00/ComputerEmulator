@@ -54,7 +54,7 @@ struct Instruction {
 		//return inst & 0x1;
 	}
 
-	BYTE getMod()const {
+	BYTE getMod() const {
 		return inst >> 0x6 & 0x3;
 		//return inst >> 0xE & 0x3;
 	}
@@ -87,15 +87,15 @@ private:
 
 		struct
 		{
-			WORD _unused;
 			WORD ax;
+			WORD _unused;
 		} word;
 
 		struct
 		{
-			WORD _unused;
-			BYTE ah;
 			BYTE al;
+			BYTE ah;
+			WORD _unused;
 		} bytes;
 	} EAX;
 	DWORD& eax = EAX.eax;
@@ -108,15 +108,15 @@ private:
 
 		struct
 		{
-			WORD _unused;
 			WORD bx;
+			WORD _unused;
 		} word;
 
 		struct
 		{
-			WORD _unused;
-			BYTE bh;
 			BYTE bl;
+			BYTE bh;
+			WORD _unused;
 		}bytes;
 	} EBX;
 	DWORD& ebx = EBX.ebx;
@@ -128,15 +128,15 @@ private:
 
 		struct
 		{
-			WORD _unused;
 			WORD cx;
+			WORD _unused;
 		} word;
 
 		struct
 		{
-			WORD _unused;
-			BYTE ch;
 			BYTE cl;
+			BYTE ch;
+			WORD _unused;
 		}bytes;
 	}ECX;
 	DWORD& ecx = ECX.ecx;
@@ -148,15 +148,15 @@ private:
 
 		struct
 		{
-			WORD _unused;
 			WORD dx;
+			WORD _unused;
 		} word;
 
 		struct
 		{
-			WORD _unused;
-			BYTE dh;
 			BYTE dl;
+			BYTE dh;
+			WORD _unused;
 		}bytes;
 	}EDX;
 	DWORD& edx = EDX.edx;
@@ -168,8 +168,8 @@ private:
 
 		struct
 		{
-			WORD _unused;
 			WORD si;
+			WORD _unused;
 		} word;
 	}ESI;
 	DWORD& esi = ESI.esi;
@@ -179,8 +179,8 @@ private:
 
 		struct
 		{
-			WORD _unused;
 			WORD di;
+			WORD _unused;
 		} word;
 	}EDI;
 	DWORD& edi = EDI.edi;
@@ -190,8 +190,8 @@ private:
 
 		struct
 		{
-			WORD _unused;
 			WORD sp;
+			WORD _unused;
 		} word;
 	}ESP;
 	DWORD& esp = ESP.esp;
@@ -201,8 +201,8 @@ private:
 
 		struct
 		{
-			WORD _unused;
 			WORD bp;
+			WORD _unused;
 		} word;
 	}EBP;
 	DWORD& ebp = EBP.ebp;
@@ -262,7 +262,7 @@ public:
 	void test() {
 		cl = 2;
 		al = 3;
-		WORD inst = 0xC101;
+		WORD inst = 0xC100;
 		writeWORD(0xFF, inst);
 		pc = 0xFF;
 

@@ -5,5 +5,5 @@
 int main() {
 	Bus bus;
 
-//	system("pause");
+	system("pause");
 }

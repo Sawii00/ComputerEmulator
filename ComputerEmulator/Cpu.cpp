@@ -97,196 +97,6 @@ void Cpu::print_registers() {
 	std::cout << "ebp: " << ebp << '\n';
 }
 
-/*//COMPUTE SECOND OPERAND
-
-void Cpu::computeSecondOperandMod0() {
-	BYTE r_m = curr_instruction.getR_M();
-
-	switch (r_m)
-	{
-	case 0x00:
-	{
-		if (curr_instruction.getS()) {
-			second_operand = &eax;
-		}
-		else {
-			second_operand = &a
-		}
-	}
-	case 0x01:
-	{}
-	case 0x02:
-	{}
-	case 0x03:
-	{}
-	case 0x04:
-	{}
-	case 0x05:
-	{}
-	case 0x06:
-	{}
-	case 0x07:
-	{}
-
-	default:
-		throw "Invalid r_m val";
-	}
-}
-void Cpu::computeSecondOperandMod1() {
-}
-void Cpu::computeSecondOperandMod2() {
-}
-void Cpu::computeSecondOperandMod3() {
-}
-
-void Cpu::computeFirstOperand() {
-	if (curr_instruction.getS()) {
-		//32 bit
-
-		BYTE reg = curr_instruction.getReg();
-		switch (reg)
-		{
-		case 0x0:
-		{
-			operand_register = &eax;
-			break;
-		}
-		case 0x1:
-		{
-			operand_register = &ecx;
-			break;
-		}
-		case 0x2:
-		{
-			operand_register = &edx;
-			break;
-		}
-		case 0x3:
-		{
-			operand_register = &ebx;
-			break;
-		}
-		case 0x4:
-		{
-			operand_register = &esp;
-			break;
-		}
-		case 0x5:
-		{
-			operand_register = &ebp;
-			break;
-		}
-		case 0x6:
-		{
-			operand_register = &esi;
-			break;
-		}
-		case 0x7:
-		{
-			operand_register = &edi;
-			break;
-		}
-		default:
-			throw "Invalid register";
-		}
-	}
-	else {
-		//8 bit
-		BYTE reg = curr_instruction.getReg();
-		switch (reg)
-		{
-		case 0x0:
-		{
-			operand_register = &al;
-			break;
-		}
-		case 0x1:
-		{
-			operand_register = &cl;
-			break;
-		}
-		case 0x2:
-		{
-			operand_register = &dl;
-			break;
-		}
-		case 0x3:
-		{
-			operand_register = &bl;
-			break;
-		}
-		case 0x4:
-		{
-			operand_register = &ah;
-			break;
-		}
-		case 0x5:
-		{
-			operand_register = &ch;
-			break;
-		}
-		case 0x6:
-		{
-			operand_register = &dh;
-			break;
-		}
-		case 0x7:
-		{
-			operand_register = &bh;
-			break;
-		}
-		default:
-			throw "Invalid register";
-		}
-	}
-}
-
-void Cpu::decode() {
-	computeFirstOperand();
-
-	BYTE mod = curr_instruction.getMod();
-
-	switch (mod)
-	{
-	case 0x00:
-	{
-		//register indirect
-		computeSecondOperandMod0();
-
-		break;
-	}
-
-	case 0x01:
-	{
-		//8 bit displacement
-		computeSecondOperandMod1();
-
-		break;
-	}
-
-	case 0x02:
-	{
-		//32 bit displacement
-		computeSecondOperandMod2();
-
-		break;
-	}
-
-	case 0x03:
-	{
-		//register direct
-
-		computeSecondOperandMod3();
-
-		break;
-	}
-
-	default:
-		throw "Invalid Mode";
-	}
-}
-*/
-
 void Cpu::fetch()
 {
 	//decode next instruction
@@ -459,5 +269,149 @@ void Cpu::ADD()
 	}
 	else {
 		//8 bit
+
+		BYTE* first = nullptr;
+		BYTE* second = nullptr;
+
+		BYTE _mod = curr_instruction.getMod();
+		switch (_mod)
+		{
+		case 0x0:
+		{
+			break;
+		}
+		case 0x1:
+		{
+			break;
+		}
+		case 0x2:
+		{
+			break;
+		}
+		case 0x3:
+		{
+			//r_m is register
+			BYTE _reg = curr_instruction.getReg();
+
+			switch (_reg)
+			{
+			case 0x0:
+			{
+				first = &al;
+				break;
+			}
+			case 0x1:
+			{
+				first = &cl;
+
+				break;
+			}
+			case 0x2:
+			{
+				first = &dl;
+
+				break;
+			}
+			case 0x3:
+			{
+				first = &bl;
+
+				break;
+			}
+			case 0x4:
+			{
+				first = &ah;
+
+				break;
+			}
+			case 0x5:
+			{
+				first = &ch;
+
+				break;
+			}
+			case 0x6:
+			{
+				first = &dh;
+
+				break;
+			}
+			case 0x7:
+			{
+				first = &bh;
+
+				break;
+			}
+
+			default:
+				throw "Invalid Reg";
+			}
+			BYTE _r_m = curr_instruction.getR_M();
+
+			switch (_r_m)
+			{
+			case 0x0:
+			{
+				second = &al;
+				break;
+			}
+			case 0x1:
+			{
+				second = &cl;
+
+				break;
+			}
+			case 0x2:
+			{
+				second = &dl;
+
+				break;
+			}
+			case 0x3:
+			{
+				second = &bl;
+
+				break;
+			}
+			case 0x4:
+			{
+				second = &ah;
+
+				break;
+			}
+			case 0x5:
+			{
+				second = &ch;
+
+				break;
+			}
+			case 0x6:
+			{
+				second = &dh;
+
+				break;
+			}
+			case 0x7:
+			{
+				second = &bh;
+
+				break;
+			}
+
+			default:
+				throw "Invalid r_m";
+			}
+			break;
+		}
+
+		default:
+			throw "Invalid Mode";
+		}
+		if (!curr_instruction.getR_X()) {
+			*second += *first;
+		}
+		else {
+			*first += *second;
+		}
 	}
 }
