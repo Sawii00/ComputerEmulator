@@ -124,9 +124,8 @@ void Cpu::ADD()
 
 		DWORD* first = nullptr;
 		DWORD* second = nullptr;
-        
-        handleModRM<DWORD>(first,second);  
 
+		handleModRM<DWORD>(first, second);
 
 		if (!curr_instruction.getR_X()) {
 			*second += *first;
@@ -140,8 +139,9 @@ void Cpu::ADD()
 
 		BYTE* first = nullptr;
 		BYTE* second = nullptr;
-		handleModRM<BYTE>(first,second);
-        if (!curr_instruction.getR_X()) {
+
+		handleModRM<BYTE>(first, second);
+		if (!curr_instruction.getR_X()) {
 			*second += *first;
 		}
 		else {
