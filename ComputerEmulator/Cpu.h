@@ -283,6 +283,308 @@ public:
 	ReturnCodes writeWORD(DWORD address, WORD v);
 	ReturnCodes writeDWORD(DWORD address, DWORD v);
 
+
+    template<class T>void handleModRM(T*& first, T*& second)
+    {
+    
+        if(sizeof(T) == 1){
+            //8 bit instructions
+             
+
+            BYTE _mod = curr_instruction.getMod();
+            switch (_mod)
+            {
+            case 0x0:
+            {
+                break;
+            }
+            case 0x1:
+            {
+                break;
+            }
+            case 0x2:
+            {
+                break;
+            }
+            case 0x3:
+            {
+                //r_m is register
+                BYTE _reg = curr_instruction.getReg();
+
+                switch (_reg)
+                {
+                case 0x0:
+                {
+                    first = &al;
+                    break;
+                }
+                case 0x1:
+                {
+                    first = &cl;
+
+                    break;
+                }
+                case 0x2:
+                {
+                    first = &dl;
+
+                    break;
+                }
+                case 0x3:
+                {
+                    first = &bl;
+
+                    break;
+                }
+                case 0x4:
+                {
+                    first = &ah;
+
+                    break;
+                }
+                case 0x5:
+                {
+                    first = &ch;
+
+                    break;
+                }
+                case 0x6:
+                {
+                    first = &dh;
+
+                    break;
+                }
+                case 0x7:
+                {
+                    first = &bh;
+
+                    break;
+                }
+
+                default:
+                    throw "Invalid Reg";
+                }
+                BYTE _r_m = curr_instruction.getR_M();
+
+                switch (_r_m)
+                {
+                case 0x0:
+                {
+                    second = &al;
+                    break;
+                }
+                case 0x1:
+                {
+                    second = &cl;
+
+                    break;
+                }
+                case 0x2:
+                {
+                    second = &dl;
+
+                    break;
+                }
+                case 0x3:
+                {
+                    second = &bl;
+
+                    break;
+                }
+                case 0x4:
+                {
+                    second = &ah;
+
+                    break;
+                }
+                case 0x5:
+                {
+                    second = &ch;
+
+                    break;
+                }
+                case 0x6:
+                {
+                    second = &dh;
+
+                    break;
+                }
+                case 0x7:
+                {
+                    second = &bh;
+
+                    break;
+                }
+
+                default:
+                    throw "Invalid r_m";
+                }
+                break;
+            }
+
+            default:
+                throw "Invalid Mode";
+            }
+
+        
+        }
+        else if(sizeof(T) == 2){
+            //16bit instruction
+        
+        
+        }
+        else if(sizeof(T) == 4){
+            //32bit instruction
+        
+
+            BYTE _mod = curr_instruction.getMod();
+            switch (_mod)
+            {
+            case 0x0:
+            {
+                break;
+            }
+            case 0x1:
+            {
+                break;
+            }
+            case 0x2:
+            {
+                break;
+            }
+            case 0x3:
+            {
+                //r_m is register
+                BYTE _reg = curr_instruction.getReg();
+
+                switch (_reg)
+                {
+                case 0x0:
+                {
+                    first = &eax;
+                    break;
+                }
+                case 0x1:
+                {
+                    first = &ecx;
+
+                    break;
+                }
+                case 0x2:
+                {
+                    first = &edx;
+
+                    break;
+                }
+                case 0x3:
+                {
+                    first = &ebx;
+
+                    break;
+                }
+                case 0x4:
+                {
+                    first = &esp;
+
+                    break;
+                }
+                case 0x5:
+                {
+                    first = &ebp;
+
+                    break;
+                }
+                case 0x6:
+                {
+                    first = &esi;
+
+                    break;
+                }
+                case 0x7:
+                {
+                    first = &edi;
+
+                    break;
+                }
+
+                default:
+                    throw "Invalid Reg";
+                }
+                BYTE _r_m = curr_instruction.getR_M();
+
+                switch (_r_m)
+                {
+                case 0x0:
+                {
+                    second = &eax;
+                    break;
+                }
+                case 0x1:
+                {
+                    second = &ecx;
+
+                    break;
+                }
+                case 0x2:
+                {
+                    second = &edx;
+
+                    break;
+                }
+                case 0x3:
+                {
+                    second = &ebx;
+
+                    break;
+                }
+                case 0x4:
+                {
+                    second = &esp;
+
+                    break;
+                }
+                case 0x5:
+                {
+                    second = &ebp;
+
+                    break;
+                }
+                case 0x6:
+                {
+                    second = &esi;
+
+                    break;
+                }
+                case 0x7:
+                {
+                    second = &edi;
+
+                    break;
+                }
+
+                default:
+                    throw "Invalid r_m";
+                }
+                break;
+            }
+
+            default:
+                throw "Invalid Mode";
+            }
+            
+        }
+        else{
+            throw "Invalid Instruction Size";
+        }
+    
+    
+    
+    
+    
+    
+    }
+
+
 	//instruction functions
 
 	void ADD();
