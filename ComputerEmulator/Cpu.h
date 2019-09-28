@@ -21,14 +21,13 @@ http://www.c-jump.com/CIS77/CPU/x86/lecture.html
 
 */
 
-.
+
 /*
  ISSUES:
  - discrepancy between read and write... it writes little endian and read big endian or something like that
 
 */
 
-class Bus;
 class Cpu;
 
 struct DisassembledInstruction {
@@ -506,17 +505,17 @@ public:
 				{
 				case 0x0:
 				{
-					second = (T*)m_bus->convertAddress<DWORD>(eax);
+					second = (T*)(m_bus->convertAddress<DWORD>(eax));
 					break;
 				}
 				case 0x1:
 				{
-					second = (T*)m_bus->convertAddress<DWORD>(ecx);
+					second = (T*)(m_bus->convertAddress<DWORD>(ecx));
 					break;
 				}
 				case 0x2:
 				{
-					second = (T*)m_bus->convertAddress<DWORD>(edx);
+					second = (T*)(m_bus->convertAddress<DWORD>(edx));
 					break;
 				}
 				case 0x3:
