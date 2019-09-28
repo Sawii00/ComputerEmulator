@@ -25,7 +25,7 @@ public:
 	~Bus();
 
 	template<typename Z>
-	Z* convertAddress(DWORD address) {
+	inline Z* convertAddress(DWORD address) {
 		if (address >= 0 && address < RAM_SIZE)
 			return (Z*)(m_ram + address);
 		else

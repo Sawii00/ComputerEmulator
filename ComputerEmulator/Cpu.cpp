@@ -54,12 +54,12 @@ BYTE Cpu::readBYTE(DWORD address)
 
 WORD Cpu::readWORD(DWORD address)
 {
-	return(readBYTE(address++) << 8 | readBYTE(address));
+	return(readBYTE(address + 1) << 8 | readBYTE(address));
 }
 
 DWORD Cpu::readDWORD(DWORD address)
 {
-	return (readBYTE(address++) << 24 | readBYTE(address++) << 16 | readBYTE(address++) << 8 | readBYTE(address));
+	return (readBYTE(address + 3) << 24 | readBYTE(address + 2) << 16 | readBYTE(address + 1) << 8 | readBYTE(address));
 }
 
 ReturnCodes Cpu::writeBYTE(DWORD address, BYTE v)

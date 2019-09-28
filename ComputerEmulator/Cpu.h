@@ -21,13 +21,12 @@ http://www.c-jump.com/CIS77/CPU/x86/lecture.html
 
 */
 
-
 /*
  ISSUES:
  - discrepancy between read and write... it writes little endian and read big endian or something like that
 
 */
-
+class Bus;
 class Cpu;
 
 struct DisassembledInstruction {
@@ -260,20 +259,17 @@ public:
 	void clock();
 
 	void fetch();
-	void decode();
 	void execute();
 
 	void print_registers();
 
 	void test() {
-		cl = 2;
+		bl = 2;
 		al = 3;
-		WORD inst = 0x0503;
+		WORD inst = 0x0303;
 		writeWORD(0xFF, inst);
 		pc = 0xFF;
-		writeDWORD(pc + 2, 0x0000003F);
-
-		writeBYTE(0x3F, 10);
+		writeDWORD(0x2, 0xA);
 
 		print_registers();
 
