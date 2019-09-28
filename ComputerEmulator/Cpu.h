@@ -80,6 +80,24 @@ struct Instruction {
 	}
 };
 
+struct SIBByte {
+	BYTE  sib;
+
+	SIBByte(BYTE b)
+		:sib(b) {}
+
+	BYTE getScale() const {
+		return sib >> 0x6 & 0x3;
+	}
+
+	BYTE getIndex() const {
+		return sib >> 0x3 & 0x7;
+	}
+	BYTE getBase() const {
+		return sib & 0x7;
+	}
+};
+
 class Cpu
 {
 private:
@@ -264,13 +282,14 @@ public:
 	void print_registers();
 
 	void test() {
+		al = 1;
 		bl = 2;
-		al = 3;
-		WORD inst = 0x0303;
+		si = 5;
+		DWORD inst = 0x0304;
 		writeWORD(0xFF, inst);
 		pc = 0xFF;
-		writeDWORD(0x2, 0xA);
-
+		writeBYTE(pc + 2, 0x5E);
+		writeBYTE(0x9, 0xA);
 		print_registers();
 
 		fetch();
@@ -286,7 +305,10 @@ public:
 
 	ReturnCodes writeBYTE(DWORD address, BYTE v);
 	ReturnCodes writeWORD(DWORD address, WORD v);
+
 	ReturnCodes writeDWORD(DWORD address, DWORD v);
+
+	DWORD handleSIBInstruction();
 
 	template<typename T>
 	void handleModRM(T*& first, T*& second)
@@ -524,6 +546,9 @@ public:
 					//sib no displacement
 
 					//@TODO(sawii): implement this method
+
+					second = (T*)m_bus->convertAddress<DWORD>(handleSIBInstruction());
+
 					break;
 				}
 				case 0x5:

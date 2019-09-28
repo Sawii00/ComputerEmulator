@@ -85,6 +85,125 @@ ReturnCodes Cpu::writeDWORD(DWORD address, DWORD v)
 	return stat;
 }
 
+DWORD Cpu::handleSIBInstruction()
+{
+	{
+		SIBByte sib(readBYTE(pc++));
+
+		BYTE scale = sib.getScale();
+
+		DWORD final_address = 0x00;
+
+		BYTE index = sib.getIndex();
+		switch (index)
+		{
+		case 0x00:
+		{
+			final_address = eax;
+			break;
+		}
+		case 0x01:
+		{
+			final_address = ecx;
+
+			break;
+		}
+		case 0x02:
+		{
+			final_address = edx;
+
+			break;
+		}
+		case 0x03:
+		{
+			final_address = ebx;
+
+			break;
+		}
+		case 0x04:
+		{
+			break;
+		}
+		case 0x05:
+		{
+			final_address = ebp;
+
+			break;
+		}
+		case 0x06:
+		{
+			final_address = esi;
+
+			break;
+		}
+		case 0x07:
+		{
+			final_address = edi;
+
+			break;
+		}
+		default:
+			throw "Invalid Index";
+		}
+		
+		final_address = final_address<<scale;
+
+		BYTE base = sib.getBase();
+		switch (base)
+		{
+		case 0x00:
+		{
+			final_address += eax;
+			break;
+		}
+		case 0x01:
+		{
+			final_address += ecx;
+
+			break;
+		}
+		case 0x02:
+		{
+			final_address += edx;
+
+			break;
+		}
+		case 0x03:
+		{
+			final_address += ebx;
+
+			break;
+		}
+		case 0x04:
+		{
+			break;
+		}
+		case 0x05:
+		{
+			final_address += ebp;
+
+			break;
+		}
+		case 0x06:
+		{
+			final_address += esi;
+
+			break;
+		}
+		case 0x07:
+		{
+			final_address += edi;
+
+			break;
+		}
+		default:
+			throw "Invalid Index";
+		}
+
+		return final_address;
+	}
+}
+
 void Cpu::print_registers() {
 	std::cout << "eax: " << eax << '\n';
 	std::cout << "ebx: " << ebx << '\n';
