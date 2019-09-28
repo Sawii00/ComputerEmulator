@@ -47,22 +47,22 @@ void Cpu::clearFlags()
 void Cpu::clock()
 {
 }
-BYTE Cpu::read(DWORD address)
+BYTE Cpu::readBYTE(DWORD address)
 {
 	return m_bus->read(address);
 }
 
 WORD Cpu::readWORD(DWORD address)
 {
-	return(read(address++) << 8 | read(address));
+	return(readBYTE(address++) << 8 | readBYTE(address));
 }
 
 DWORD Cpu::readDWORD(DWORD address)
 {
-	return (read(address++) << 24 | read(address++) << 16 | read(address++) << 8 | read(address));
+	return (readBYTE(address++) << 24 | readBYTE(address++) << 16 | readBYTE(address++) << 8 | readBYTE(address));
 }
 
-ReturnCodes Cpu::write(DWORD address, BYTE v)
+ReturnCodes Cpu::writeBYTE(DWORD address, BYTE v)
 {
 	return m_bus->write(address, v);
 }
@@ -71,7 +71,7 @@ ReturnCodes Cpu::writeWORD(DWORD address, WORD v)
 {
 	ReturnCodes stat = SUCCESS;
 	for (register int i = 0; i < 2 && stat != BAD_MEMORY_REQUEST; i++) {
-		stat = write(address + i, v >> (8 * i) & 0xff);
+		stat = writeBYTE(address + i, v >> (8 * i) & 0xff);
 	}
 	return stat;
 }
@@ -80,7 +80,7 @@ ReturnCodes Cpu::writeDWORD(DWORD address, DWORD v)
 {
 	ReturnCodes stat = SUCCESS;
 	for (register int i = 0; i < 4 && stat != BAD_MEMORY_REQUEST; i++) {
-		stat = write(address + i, v >> (8 * i) & 0xff);
+		stat = writeBYTE(address + i, v >> (8 * i) & 0xff);
 	}
 	return stat;
 }
@@ -101,7 +101,8 @@ void Cpu::fetch()
 {
 	//decode next instruction
 	//read next instruction from memory at program counter
-	curr_instruction = Instruction(readWORD(pc++));
+	curr_instruction = Instruction(readWORD(pc));
+	pc += 2;
 	/*BYTE op = curr_instruction.getOpCode();
 	BYTE r = curr_instruction.getR_X();
 	BYTE s = curr_instruction.getS();

@@ -21,6 +21,13 @@ http://www.c-jump.com/CIS77/CPU/x86/lecture.html
 
 */
 
+.
+/*
+ ISSUES:
+ - discrepancy between read and write... it writes little endian and read big endian or something like that
+
+*/
+
 class Bus;
 class Cpu;
 
@@ -265,7 +272,9 @@ public:
 		WORD inst = 0x0503;
 		writeWORD(0xFF, inst);
 		pc = 0xFF;
-        writeDWORD(pc + 2, 0x0000003F);
+		writeDWORD(pc + 2, 0x0000003F);
+
+		writeBYTE(0x3F, 10);
 
 		print_registers();
 
@@ -276,11 +285,11 @@ public:
 	void interrupt();
 	void non_maskable_interrupt();
 
-	BYTE read(DWORD address);
+	BYTE readBYTE(DWORD address);
 	DWORD readDWORD(DWORD address);
 	WORD readWORD(DWORD address);
 
-	ReturnCodes write(DWORD address, BYTE v);
+	ReturnCodes writeBYTE(DWORD address, BYTE v);
 	ReturnCodes writeWORD(DWORD address, WORD v);
 	ReturnCodes writeDWORD(DWORD address, DWORD v);
 
@@ -430,123 +439,116 @@ public:
 		}
 		else if (sizeof(T) == 4) {
 			//32bit instruction
-        		BYTE _reg = curr_instruction.getReg();
+			BYTE _reg = curr_instruction.getReg();
 
-				switch (_reg)
-				{
-				case 0x0:
-				{
-					first = (T*)(&eax);
-					break;
-				}
-				case 0x1:
-				{
-					first = (T*)&ecx;
+			switch (_reg)
+			{
+			case 0x0:
+			{
+				first = (T*)(&eax);
+				break;
+			}
+			case 0x1:
+			{
+				first = (T*)&ecx;
 
-					break;
-				}
-				case 0x2:
-				{
-					first = (T*)&edx;
+				break;
+			}
+			case 0x2:
+			{
+				first = (T*)&edx;
 
-					break;
-				}
-				case 0x3:
-				{
-					first = (T*)&ebx;
+				break;
+			}
+			case 0x3:
+			{
+				first = (T*)&ebx;
 
-					break;
-				}
-				case 0x4:
-				{
-					first = (T*)&esp;
+				break;
+			}
+			case 0x4:
+			{
+				first = (T*)&esp;
 
-					break;
-				}
-				case 0x5:
-				{
-					first = (T*)&ebp;
+				break;
+			}
+			case 0x5:
+			{
+				first = (T*)&ebp;
 
-					break;
-				}
-				case 0x6:
-				{
-					first = (T*)&esi;
+				break;
+			}
+			case 0x6:
+			{
+				first = (T*)&esi;
 
-					break;
-				}
-				case 0x7:
-				{
-					first = (T*)&edi;
+				break;
+			}
+			case 0x7:
+			{
+				first = (T*)&edi;
 
-					break;
-				}
+				break;
+			}
 
-				default:
-					throw "Invalid Reg";
-				}
-
+			default:
+				throw "Invalid Reg";
+			}
 
 			BYTE _mod = curr_instruction.getMod();
 			switch (_mod)
 			{
 			case 0x0:
 			{
-                BYTE _r_m = curr_instruction.getR_M();
+				BYTE _r_m = curr_instruction.getR_M();
 
 				switch (_r_m)
 				{
 				case 0x0:
 				{
-					second = m_bus->convertAddress<DWORD>(eax);
+					second = (T*)m_bus->convertAddress<DWORD>(eax);
 					break;
 				}
 				case 0x1:
 				{
-					second = m_bus->convertAddress<DWORD>(ecx);
+					second = (T*)m_bus->convertAddress<DWORD>(ecx);
 					break;
 				}
 				case 0x2:
 				{
-			
-					second = m_bus->convertAddress<DWORD>(edx);
+					second = (T*)m_bus->convertAddress<DWORD>(edx);
 					break;
 				}
 				case 0x3:
 				{
-
-					second = m_bus->convertAddress<DWORD>(ebx);
+					second = (T*)m_bus->convertAddress<DWORD>(ebx);
 					break;
 				}
 				case 0x4:
 				{
-                    //sib no displacement
+					//sib no displacement
 
-                    //@TODO(sawii): implement this method
+					//@TODO(sawii): implement this method
 					break;
 				}
 				case 0x5:
 				{
-				    //displacement only	
-                    
-                    *second = m_bus->convertAddress<DWORD>(readDWORD(pc));
-                    pc+=4;
+					//displacement only
 
-                    break;
+					second = (T*)m_bus->convertAddress<DWORD>(readDWORD(pc));
+					pc += 4;
+
+					break;
 				}
 				case 0x6:
 				{
-				
-
-					second = m_bus->convertAddress<DWORD>(esi);
+					second = (T*)m_bus->convertAddress<DWORD>(esi);
 
 					break;
 				}
 				case 0x7:
 				{
-			
-					second = m_bus->convertAddress<DWORD>(edi);
-
+					second = (T*)m_bus->convertAddress<DWORD>(edi);
 
 					break;
 				}
@@ -554,7 +556,6 @@ public:
 				default:
 					throw "Invalid r_m";
 				}
-
 
 				break;
 			}
@@ -568,7 +569,6 @@ public:
 			}
 			case 0x3:
 			{
-			
 				BYTE _r_m = curr_instruction.getR_M();
 
 				switch (_r_m)
