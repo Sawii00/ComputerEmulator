@@ -262,9 +262,10 @@ public:
 	void test() {
 		cl = 2;
 		al = 3;
-		WORD inst = 0xC100;
+		WORD inst = 0x0503;
 		writeWORD(0xFF, inst);
 		pc = 0xFF;
+        writeDWORD(pc + 2, 0x0000003F);
 
 		print_registers();
 
@@ -429,26 +430,7 @@ public:
 		}
 		else if (sizeof(T) == 4) {
 			//32bit instruction
-
-			BYTE _mod = curr_instruction.getMod();
-			switch (_mod)
-			{
-			case 0x0:
-			{
-				break;
-			}
-			case 0x1:
-			{
-				break;
-			}
-			case 0x2:
-			{
-				break;
-			}
-			case 0x3:
-			{
-				//r_m is register
-				BYTE _reg = curr_instruction.getReg();
+        		BYTE _reg = curr_instruction.getReg();
 
 				switch (_reg)
 				{
@@ -503,6 +485,90 @@ public:
 				default:
 					throw "Invalid Reg";
 				}
+
+
+			BYTE _mod = curr_instruction.getMod();
+			switch (_mod)
+			{
+			case 0x0:
+			{
+                BYTE _r_m = curr_instruction.getR_M();
+
+				switch (_r_m)
+				{
+				case 0x0:
+				{
+					second = m_bus->convertAddress<DWORD>(eax);
+					break;
+				}
+				case 0x1:
+				{
+					second = m_bus->convertAddress<DWORD>(ecx);
+					break;
+				}
+				case 0x2:
+				{
+			
+					second = m_bus->convertAddress<DWORD>(edx);
+					break;
+				}
+				case 0x3:
+				{
+
+					second = m_bus->convertAddress<DWORD>(ebx);
+					break;
+				}
+				case 0x4:
+				{
+                    //sib no displacement
+
+                    //@TODO(sawii): implement this method
+					break;
+				}
+				case 0x5:
+				{
+				    //displacement only	
+                    
+                    *second = m_bus->convertAddress<DWORD>(readDWORD(pc));
+                    pc+=4;
+
+                    break;
+				}
+				case 0x6:
+				{
+				
+
+					second = m_bus->convertAddress<DWORD>(esi);
+
+					break;
+				}
+				case 0x7:
+				{
+			
+					second = m_bus->convertAddress<DWORD>(edi);
+
+
+					break;
+				}
+
+				default:
+					throw "Invalid r_m";
+				}
+
+
+				break;
+			}
+			case 0x1:
+			{
+				break;
+			}
+			case 0x2:
+			{
+				break;
+			}
+			case 0x3:
+			{
+			
 				BYTE _r_m = curr_instruction.getR_M();
 
 				switch (_r_m)
