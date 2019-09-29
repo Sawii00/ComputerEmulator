@@ -66,11 +66,10 @@ ReturnCodes Cpu::writeBYTE(DWORD address, BYTE v)
 {
 	return m_bus->write(address, v);
 }
-//have no clue if that works
 ReturnCodes Cpu::writeWORD(DWORD address, WORD v)
 {
 	ReturnCodes stat = SUCCESS;
-	for (register int i = 0; i < 2 && stat != BAD_MEMORY_REQUEST; i++) {
+	for (int i = 0; i < 2 && stat != BAD_MEMORY_REQUEST; i++) {
 		stat = writeBYTE(address + i, v >> (8 * i) & 0xff);
 	}
 	return stat;
@@ -79,7 +78,7 @@ ReturnCodes Cpu::writeWORD(DWORD address, WORD v)
 ReturnCodes Cpu::writeDWORD(DWORD address, DWORD v)
 {
 	ReturnCodes stat = SUCCESS;
-	for (register int i = 0; i < 4 && stat != BAD_MEMORY_REQUEST; i++) {
+	for (int i = 0; i < 4 && stat != BAD_MEMORY_REQUEST; i++) {
 		stat = writeBYTE(address + i, v >> (8 * i) & 0xff);
 	}
 	return stat;
@@ -88,7 +87,7 @@ ReturnCodes Cpu::writeDWORD(DWORD address, DWORD v)
 DWORD Cpu::handleSIBInstruction()
 {
 	{
-		SIBByte sib(readBYTE(pc++));
+		SIBByte sib(readFromPC<BYTE>());
 
 		BYTE scale = sib.getScale();
 
@@ -145,8 +144,8 @@ DWORD Cpu::handleSIBInstruction()
 		default:
 			throw "Invalid Index";
 		}
-		
-		final_address = final_address<<scale;
+
+		final_address = final_address << scale;
 
 		BYTE base = sib.getBase();
 		switch (base)
@@ -207,7 +206,6 @@ DWORD Cpu::handleSIBInstruction()
 void Cpu::print_registers() {
 	std::cout << "eax: " << eax << '\n';
 	std::cout << "ebx: " << ebx << '\n';
-
 	std::cout << "ecx: " << ecx << '\n';
 	std::cout << "edx: " << edx << '\n';
 	std::cout << "esi: " << esi << '\n';
@@ -220,14 +218,9 @@ void Cpu::fetch()
 {
 	//decode next instruction
 	//read next instruction from memory at program counter
-	curr_instruction = Instruction(readWORD(pc));
-	pc += 2;
-	/*BYTE op = curr_instruction.getOpCode();
-	BYTE r = curr_instruction.getR_X();
-	BYTE s = curr_instruction.getS();
-	BYTE m = curr_instruction.getMod();
-	BYTE reg = curr_instruction.getReg();
-	BYTE r_ = curr_instruction.getR_M();*/
+	BYTE opcode = readFromPC<BYTE>();
+	BYTE mod_rm = readFromPC<BYTE>();
+	curr_instruction = Instruction(opcode << 8 | mod_rm);
 }
 
 void Cpu::execute()

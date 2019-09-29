@@ -20,10 +20,15 @@
 http://www.c-jump.com/CIS77/CPU/x86/lecture.html
 
 */
+/*
+@TODO:
+	- Refactor the huge usage of switch cases with maps or something a little more
+		efficient
+
+*/
 
 /*
  ISSUES:
- - discrepancy between read and write... it writes little endian and read big endian or something like that
 
 */
 class Bus;
@@ -282,19 +287,33 @@ public:
 	void print_registers();
 
 	void test() {
-		al = 1;
-		bl = 2;
-		si = 5;
-		DWORD inst = 0x0304;
-		writeWORD(0xFF, inst);
-		pc = 0xFF;
-		writeBYTE(pc + 2, 0x5E);
-		writeBYTE(0x9, 0xA);
-		print_registers();
+		eax = 0;
+		ebx = 1;
+		ecx = 2;
+		edx = 3;
 
-		fetch();
-		execute();
-		print_registers();
+		//writing machine code to memory
+		ebp = 1024;
+
+		BYTE arr[] = { 0x03, 0x01, 0x03, 0x04, 0x4A, 0x03, 0x05, 0x3F, 0x00, 0x00, 0x00, 0x03, 0x43, 0x0A, 0x03, 0x44, 0x59, 0x0B, 0x03, 0x83, 0x00, 0x01, 0x00, 0x00, 0x03, 0x84, 0x5a, 0x00, 0x01, 0x00, 0x00, 0x01, 0xD8 };
+		for (int i = 0; i < 33; i++) {
+			writeBYTE(ebp++, arr[i]);
+		}
+
+		pc = 1024;
+		writeBYTE(0x02, 2);
+		writeBYTE(0x07, 3);
+		writeBYTE(0x3F, 5);
+		writeBYTE(0xB, 8);
+		writeBYTE(0xF, 7);
+		writeBYTE(0x101, 17);
+		writeBYTE(0x105, 15);
+		for (int i = 0; i < 8; i++) {
+			fetch();
+			execute();
+			print_registers();
+			std::cout << "\n\n";
+		}
 	}
 	void interrupt();
 	void non_maskable_interrupt();
@@ -302,6 +321,26 @@ public:
 	BYTE readBYTE(DWORD address);
 	DWORD readDWORD(DWORD address);
 	WORD readWORD(DWORD address);
+
+	template <typename TYPE>
+	TYPE readFromPC() {
+		TYPE res = 0;
+		if (sizeof(TYPE) == 1) {
+			res = readBYTE(pc++);
+		}
+		else if (sizeof(TYPE) == 2) {
+			res = readWORD(pc);
+			pc += 2;
+		}
+		else if (sizeof(TYPE) == 4) {
+			res = readDWORD(pc);
+			pc += 4;
+		}
+		else {
+			throw "Invalid size";
+		}
+		return res;
+	}
 
 	ReturnCodes writeBYTE(DWORD address, BYTE v);
 	ReturnCodes writeWORD(DWORD address, WORD v);
@@ -317,6 +356,8 @@ public:
 			//8 bit instructions
 
 			BYTE _mod = curr_instruction.getMod();
+
+			//@TODO(sawii): finish 8 bit Mod cases
 			switch (_mod)
 			{
 			case 0x0:
@@ -391,6 +432,10 @@ public:
 				}
 				BYTE _r_m = curr_instruction.getR_M();
 
+				//@TODO(sawii): possible alternative is having an array of T*
+				// ex: arr = {&al, &cl, &dl, &bl ...} and can be indexed by _r_m
+				//remember to handle cases > 7
+
 				switch (_r_m)
 				{
 				case 0x0:
@@ -453,6 +498,7 @@ public:
 		}
 		else if (sizeof(T) == 2) {
 			//16bit instruction
+			//@TODO(sawii): implement 16 bit instruction MODRM handler
 		}
 		else if (sizeof(T) == 4) {
 			//32bit instruction
@@ -545,8 +591,6 @@ public:
 				{
 					//sib no displacement
 
-					//@TODO(sawii): implement this method
-
 					second = (T*)m_bus->convertAddress<DWORD>(handleSIBInstruction());
 
 					break;
@@ -555,8 +599,7 @@ public:
 				{
 					//displacement only
 
-					second = (T*)m_bus->convertAddress<DWORD>(readDWORD(pc));
-					pc += 4;
+					second = (T*)m_bus->convertAddress<DWORD>(readFromPC<DWORD>());
 
 					break;
 				}
@@ -581,10 +624,151 @@ public:
 			}
 			case 0x1:
 			{
+				//@TODO(sawii): implement this
+				//register address + 8bit displacement
+
+				BYTE _r_m = curr_instruction.getR_M();
+
+				switch (_r_m)
+				{
+				case 0x0:
+				{
+					BYTE disp = readFromPC<BYTE>();
+
+					second = (T*)m_bus->convertAddress<DWORD>(eax + disp);
+
+					break;
+				}
+				case 0x1:
+				{
+					BYTE disp = readFromPC<BYTE>();
+
+					second = (T*)m_bus->convertAddress<DWORD>(ecx + disp);
+					break;
+				}
+				case 0x2:
+				{
+					BYTE disp = readFromPC<BYTE>();
+
+					second = (T*)m_bus->convertAddress<DWORD>(edx + disp);
+					break;
+				}
+				case 0x3:
+				{
+					BYTE disp = readFromPC<BYTE>();
+
+					second = (T*)m_bus->convertAddress<DWORD>(ebx + disp);
+					break;
+				}
+				case 0x4:
+				{
+					//sib byte + disp8
+					DWORD sib_address = handleSIBInstruction();
+					BYTE disp = readFromPC<BYTE>();
+					second = (T*)m_bus->convertAddress<DWORD>(sib_address + disp);
+					break;
+				}
+				case 0x5:
+				{
+					BYTE disp = readFromPC<BYTE>();
+
+					second = (T*)m_bus->convertAddress<DWORD>(ebp + disp);
+					break;
+				}
+				case 0x6:
+				{
+					BYTE disp = readFromPC<BYTE>();
+
+					second = (T*)m_bus->convertAddress<DWORD>(esi + disp);
+					break;
+				}
+				case 0x7:
+				{
+					BYTE disp = readFromPC<BYTE>();
+
+					second = (T*)m_bus->convertAddress<DWORD>(edi + disp);
+					break;
+				}
+
+				default:
+					throw "Invalid r_m";
+				}
+
 				break;
 			}
 			case 0x2:
 			{
+				//@TODO(sawii): implement this
+				//register address + 32bit displacement
+
+				BYTE _r_m = curr_instruction.getR_M();
+
+				switch (_r_m)
+				{
+				case 0x0:
+				{
+					DWORD disp = readFromPC<DWORD>();
+
+					second = (T*)m_bus->convertAddress<DWORD>(eax + disp);
+
+					break;
+				}
+				case 0x1:
+				{
+					DWORD disp = readFromPC<DWORD>();
+
+					second = (T*)m_bus->convertAddress<DWORD>(ecx + disp);
+					break;
+				}
+				case 0x2:
+				{
+					DWORD disp = readFromPC<DWORD>();
+
+					second = (T*)m_bus->convertAddress<DWORD>(edx + disp);
+					break;
+				}
+				case 0x3:
+				{
+					DWORD disp = readFromPC<DWORD>();
+
+					second = (T*)m_bus->convertAddress<DWORD>(ebx + disp);
+					break;
+				}
+				case 0x4:
+				{
+					//sib byte + disp32
+					DWORD sib_address = handleSIBInstruction();
+					DWORD disp = readFromPC<DWORD>();
+
+					second = (T*)m_bus->convertAddress<DWORD>(sib_address + disp);
+					break;
+				}
+				case 0x5:
+				{
+					DWORD disp = readFromPC<DWORD>();
+
+					second = (T*)m_bus->convertAddress<DWORD>(ebp + disp);
+					break;
+				}
+				case 0x6:
+				{
+					DWORD disp = readFromPC<DWORD>();
+
+					second = (T*)m_bus->convertAddress<DWORD>(esi + disp);
+					break;
+				}
+				case 0x7:
+				{
+					DWORD disp = readFromPC<DWORD>();
+
+					second = (T*)m_bus->convertAddress<DWORD>(edi + disp);
+					break;
+				}
+
+				default:
+					throw "Invalid r_m";
+				}
+
 				break;
 			}
 			case 0x3:
