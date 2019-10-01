@@ -1,6 +1,5 @@
 #pragma once
-#include "Error.h"
-#include "Types.h"
+#include "Utils.h"
 #include <string>
 #include "Bus.h"
 #include <array>
@@ -22,8 +21,13 @@ http://www.c-jump.com/CIS77/CPU/x86/lecture.html
 */
 /*
 @TODO:
-	- Refactor the huge usage of switch cases with maps or something a little more
-		efficient
+	- fix handleSIBInstruction (deal with case 0x05 of base appropriately)
+	- refactor handleSIBInstruction with array
+
+	- implement 8 bit instruction decoder
+	- implement prefixes and 16 bit instruction decoder
+	- implement segment registers
+	- implement asynchronous events and interrupts
 
 */
 
@@ -34,6 +38,12 @@ http://www.c-jump.com/CIS77/CPU/x86/lecture.html
 class Bus;
 class Cpu;
 
+/*
+	The purpose of this struct is to distinguish every instruction and package the corresponding function pointer,
+	how many cycles it takes (to correctly emulate the machine) and a string_like name to disassemble it
+
+*/
+
 struct DisassembledInstruction {
 	DisassembledInstruction(std::string n = "", std::function<void(Cpu*)>f = nullptr, BYTE c = 0)
 		:name(n), instruction_function(f), cycles(c) {};
@@ -42,6 +52,38 @@ struct DisassembledInstruction {
 	std::function<void(Cpu*)>instruction_function;
 	BYTE cycles;
 };
+
+/*
+	This instruction class encapsulates the first two bytes of the instruction (The opcode and the ModRM byte) and
+	offers methods for quickly access the different parts of the two bytes
+
+	The bytes are in the form:
+	------|-|-     --|---|---
+	opcode|r_x|s   mod|reg|r_m
+
+	opcode: identifies the instruction
+	r_x: 1 = r_m --> reg
+		 0 = reg --> r_m
+	s: 1 = 32bit
+	   0 = 8bit instruction
+
+	mod: 00 = indirect register mode
+		  01 = 8bit displacement
+		  10 = 32 bit displacement
+		  11 = direct register mode
+
+	reg: 000 = eax
+		 001 = ecx
+		 010 = edx
+		 011 = ebx
+		 100 = esp
+		 101 = ebp
+		 110 = esi
+		 111 = edi
+
+	r_m: depends on the current mod
+
+*/
 
 struct Instruction {
 	WORD inst;
@@ -84,6 +126,38 @@ struct Instruction {
 		return inst & 0xFF;
 	}
 };
+
+/*
+	This struct encapsulates the ScaleIndexBase byte that might follow the modRM byte
+
+	Structure:
+	--|---|---
+	scale|index|base
+
+	scale: 00 = index*1
+		   01 = index*2
+		   10 = index*4
+		   11 = index*8
+
+	index: 000 = eax
+		   001 = ecx
+		   010 = edx
+		   011 = ebx
+		   100 = illegal
+		   101 = ebp
+		   110 = esi
+		   111 = edi
+
+	base:  000 = eax
+		   001 = ecx
+		   010 = edx
+		   011 = ebx
+		   100 = esp
+		   101 = if(mod == 00) displacement only else if(mod == 01 || mod == 10) ebp
+		   110 = esi
+		   111 = edi
+
+*/
 
 struct SIBByte {
 	BYTE  sib;
@@ -352,10 +426,21 @@ public:
 	template<typename T>
 	void handleModRM(T*& first, T*& second)
 	{
+		//if desperate for efficiency, we can try to use the array trick for the other switch cases by using a lambda for each
+		//	case and create an array of std::function that can hold them... NOT SURE IT IMPROVES
+
 		if (sizeof(T) == 1) {
 			//8 bit instructions
-
 			BYTE _mod = curr_instruction.getMod();
+
+			//the first operand is always the Register BYTE
+			BYTE* regs[8] = { &al, &cl, &dl, &bl, &ah, &ch, &dh, &bh };
+			BYTE _reg = curr_instruction.getReg();
+
+			if (!(_reg >= 0 && _reg < 8)) {
+				throw "Invalid Register BYTE";
+			}
+			first = (T*)regs[_reg];
 
 			//@TODO(sawii): finish 8 bit Mod cases
 			switch (_mod)
@@ -375,120 +460,15 @@ public:
 			case 0x3:
 			{
 				//r_m is register
-				BYTE _reg = curr_instruction.getReg();
 
-				switch (_reg)
-				{
-				case 0x0:
-				{
-					first = (T*)&al;
-					break;
-				}
-				case 0x1:
-				{
-					first = (T*)&cl;
-
-					break;
-				}
-				case 0x2:
-				{
-					first = (T*)&dl;
-
-					break;
-				}
-				case 0x3:
-				{
-					first = (T*)&bl;
-
-					break;
-				}
-				case 0x4:
-				{
-					first = (T*)&ah;
-
-					break;
-				}
-				case 0x5:
-				{
-					first = (T*)&ch;
-
-					break;
-				}
-				case 0x6:
-				{
-					first = (T*)&dh;
-
-					break;
-				}
-				case 0x7:
-				{
-					first = (T*)&bh;
-
-					break;
-				}
-
-				default:
-					throw "Invalid Reg";
-				}
 				BYTE _r_m = curr_instruction.getR_M();
 
-				//@TODO(sawii): possible alternative is having an array of T*
-				// ex: arr = {&al, &cl, &dl, &bl ...} and can be indexed by _r_m
-				//remember to handle cases > 7
-
-				switch (_r_m)
-				{
-				case 0x0:
-				{
-					second = (T*)&al;
-					break;
-				}
-				case 0x1:
-				{
-					second = (T*)&cl;
-
-					break;
-				}
-				case 0x2:
-				{
-					second = (T*)&dl;
-
-					break;
-				}
-				case 0x3:
-				{
-					second = (T*)&bl;
-
-					break;
-				}
-				case 0x4:
-				{
-					second = (T*)&ah;
-
-					break;
-				}
-				case 0x5:
-				{
-					second = (T*)&ch;
-
-					break;
-				}
-				case 0x6:
-				{
-					second = (T*)&dh;
-
-					break;
-				}
-				case 0x7:
-				{
-					second = (T*)&bh;
-
-					break;
+				if (!(_r_m >= 0 && _r_m < 8)) {
+					throw "Invalid _r_m BYTE";
 				}
 
-				default:
-					throw "Invalid r_m";
-				}
+				second = (T*)regs[_r_m];
+
 				break;
 			}
 
@@ -502,61 +482,16 @@ public:
 		}
 		else if (sizeof(T) == 4) {
 			//32bit instruction
+
+			//the first operand is always the reg byte
+
 			BYTE _reg = curr_instruction.getReg();
+			DWORD* regs[8] = { &eax, &ecx, &edx, &ebx, &esp, &ebp, &esi, &edi };
 
-			switch (_reg)
-			{
-			case 0x0:
-			{
-				first = (T*)(&eax);
-				break;
+			if (!(_reg >= 0 && _reg < 8)) {
+				throw "Invalid _reg BYTE";
 			}
-			case 0x1:
-			{
-				first = (T*)&ecx;
-
-				break;
-			}
-			case 0x2:
-			{
-				first = (T*)&edx;
-
-				break;
-			}
-			case 0x3:
-			{
-				first = (T*)&ebx;
-
-				break;
-			}
-			case 0x4:
-			{
-				first = (T*)&esp;
-
-				break;
-			}
-			case 0x5:
-			{
-				first = (T*)&ebp;
-
-				break;
-			}
-			case 0x6:
-			{
-				first = (T*)&esi;
-
-				break;
-			}
-			case 0x7:
-			{
-				first = (T*)&edi;
-
-				break;
-			}
-
-			default:
-				throw "Invalid Reg";
-			}
+			first = (T*)regs[_reg];
 
 			BYTE _mod = curr_instruction.getMod();
 			switch (_mod)
@@ -699,6 +634,7 @@ public:
 			case 0x2:
 			{
 				//@TODO(sawii): implement this
+
 				//register address + 32bit displacement
 
 				BYTE _r_m = curr_instruction.getR_M();
@@ -774,60 +710,11 @@ public:
 			case 0x3:
 			{
 				BYTE _r_m = curr_instruction.getR_M();
-
-				switch (_r_m)
-				{
-				case 0x0:
-				{
-					second = (T*)&eax;
-					break;
+				if (!(_r_m >= 0 && _r_m < 8)) {
+					throw "Invalid _r_m BYTE";
 				}
-				case 0x1:
-				{
-					second = (T*)&ecx;
+				second = (T*)regs[_r_m];
 
-					break;
-				}
-				case 0x2:
-				{
-					second = (T*)&edx;
-
-					break;
-				}
-				case 0x3:
-				{
-					second = (T*)&ebx;
-
-					break;
-				}
-				case 0x4:
-				{
-					second = (T*)&esp;
-
-					break;
-				}
-				case 0x5:
-				{
-					second = (T*)&ebp;
-
-					break;
-				}
-				case 0x6:
-				{
-					second = (T*)&esi;
-
-					break;
-				}
-				case 0x7:
-				{
-					second = (T*)&edi;
-
-					break;
-				}
-
-				default:
-					throw "Invalid r_m";
-				}
 				break;
 			}
 

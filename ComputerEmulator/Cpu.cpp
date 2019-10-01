@@ -175,10 +175,11 @@ DWORD Cpu::handleSIBInstruction()
 		}
 		case 0x04:
 		{
-			break;
+			final_address += esp;
 		}
 		case 0x05:
 		{
+			//TODO(important): fix this according to the correct intel guidelines
 			final_address += ebp;
 
 			break;
