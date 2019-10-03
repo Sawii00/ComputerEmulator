@@ -499,8 +499,20 @@ public:
 			case 0x0:
 			{
 				BYTE _r_m = curr_instruction.getR_M();
-
-				switch (_r_m)
+                std::function<void()> r_m_arr =
+                {
+                    [&](){ second = (T*)(m_bus->convertAddress<DWORD>(eax))},
+                 [&](){ second = (T*)(m_bus->convertAddress<DWORD>(ecx))},
+                 [&](){ second = (T*)(m_bus->convertAddress<DWORD>(edx))},
+                 [&](){ second = (T*)(m_bus->convertAddress<DWORD>(ebx))},
+                 [&](){ second = (T*)m_bus->convertAddress<DWORD>(handleSIBInstruction())},
+                 [&](){ second = (T*)(m_bus->convertAddress<DWORD>(readFromPC<DWORD>()))},
+                 [&](){ second = (T*)(m_bus->convertAddress<DWORD>(esi))},
+                 [&](){ second = (T*)(m_bus->convertAddress<DWORD>(edi))}
+                
+                }
+                r_m_arr[_r_m]();
+                switch (_r_m)
 				{
 				case 0x0:
 				{
