@@ -499,20 +499,24 @@ public:
 			case 0x0:
 			{
 				BYTE _r_m = curr_instruction.getR_M();
-                std::function<void()> r_m_arr =
-                {
-                    [&](){ second = (T*)(m_bus->convertAddress<DWORD>(eax))},
-                 [&](){ second = (T*)(m_bus->convertAddress<DWORD>(ecx))},
-                 [&](){ second = (T*)(m_bus->convertAddress<DWORD>(edx))},
-                 [&](){ second = (T*)(m_bus->convertAddress<DWORD>(ebx))},
-                 [&](){ second = (T*)m_bus->convertAddress<DWORD>(handleSIBInstruction())},
-                 [&](){ second = (T*)(m_bus->convertAddress<DWORD>(readFromPC<DWORD>()))},
-                 [&](){ second = (T*)(m_bus->convertAddress<DWORD>(esi))},
-                 [&](){ second = (T*)(m_bus->convertAddress<DWORD>(edi))}
-                
-                }
-                r_m_arr[_r_m]();
-                switch (_r_m)
+
+				//this gets optimized away somehow
+				/*std::function<void()> r_m_arr[8] =
+				{
+					[&]() { second = (T*)(m_bus->convertAddress<DWORD>(eax)); },
+					[&]() { second = (T*)(m_bus->convertAddress<DWORD>(ecx)); },
+					[&]() { second = (T*)(m_bus->convertAddress<DWORD>(edx)); },
+					[&]() { second = (T*)(m_bus->convertAddress<DWORD>(ebx)); },
+					[&]() { second = (T*)m_bus->convertAddress<DWORD>(handleSIBInstruction()); },
+					[&]() { second = (T*)(m_bus->convertAddress<DWORD>(readFromPC<DWORD>())); },
+					[&]() { second = (T*)(m_bus->convertAddress<DWORD>(esi)); },
+					[&]() { second = (T*)(m_bus->convertAddress<DWORD>(edi)); }
+				};
+
+								(r_m_arr[_r_m])();
+								break;*/
+
+				switch (_r_m)
 				{
 				case 0x0:
 				{
@@ -566,15 +570,27 @@ public:
 				default:
 					throw "Invalid r_m";
 				}
-
 				break;
 			}
 			case 0x1:
 			{
 				//@TODO(sawii): implement this
 				//register address + 8bit displacement
-
 				BYTE _r_m = curr_instruction.getR_M();
+				/*std::function<void()> r_m_arr[8] =
+				{
+					[&]() {second = (T*)m_bus->convertAddress<DWORD>(eax + readFromPC<BYTE>()); },
+					[&]() { second = (T*)m_bus->convertAddress<DWORD>(ecx + readFromPC<BYTE>()); },
+					[&]() { second = (T*)m_bus->convertAddress<DWORD>(edx + readFromPC<BYTE>()); },
+					[&]() { second = (T*)m_bus->convertAddress<DWORD>(ebx + readFromPC<BYTE>()); },
+					[&]() { second = (T*)m_bus->convertAddress<DWORD>(handleSIBInstruction() + readFromPC<BYTE>()); },
+					[&]() { second = (T*)m_bus->convertAddress<DWORD>(ebp + readFromPC<BYTE>()); },
+					[&]() { second = (T*)m_bus->convertAddress<DWORD>(esi + readFromPC<BYTE>()); },
+					[&]() {second = (T*)m_bus->convertAddress<DWORD>(edi + readFromPC<BYTE>()); }
+				};
+
+				(r_m_arr[_r_m])();
+				break;*/
 
 				switch (_r_m)
 				{
@@ -640,7 +656,6 @@ public:
 				default:
 					throw "Invalid r_m";
 				}
-
 				break;
 			}
 			case 0x2:
@@ -650,6 +665,20 @@ public:
 				//register address + 32bit displacement
 
 				BYTE _r_m = curr_instruction.getR_M();
+				/*std::function<void()> r_m_arr[8] =
+				{
+					[&]() {second = (T*)m_bus->convertAddress<DWORD>(eax + readFromPC<DWORD>()); },
+					[&]() { second = (T*)m_bus->convertAddress<DWORD>(ecx + readFromPC<DWORD>()); },
+					[&]() { second = (T*)m_bus->convertAddress<DWORD>(edx + readFromPC<DWORD>()); },
+					[&]() { second = (T*)m_bus->convertAddress<DWORD>(ebx + readFromPC<DWORD>()); },
+					[&]() { second = (T*)m_bus->convertAddress<DWORD>(handleSIBInstruction() + readFromPC<DWORD>()); },
+					[&]() { second = (T*)m_bus->convertAddress<DWORD>(ebp + readFromPC<DWORD>()); },
+					[&]() { second = (T*)m_bus->convertAddress<DWORD>(esi + readFromPC<DWORD>()); },
+					[&]() {second = (T*)m_bus->convertAddress<DWORD>(edi + readFromPC<DWORD>()); }
+				};
+
+				(r_m_arr[_r_m])();
+				break;*/
 
 				switch (_r_m)
 				{

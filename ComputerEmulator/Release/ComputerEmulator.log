@@ -1,0 +1,19 @@
+﻿  Bus.cpp
+  Cpu.cpp
+c:\dev\c++\computeremulator\computeremulator\cpu.h(406): warning C4244: '=': conversion from 'WORD' to 'TYPE', possible loss of data
+          with
+          [
+              TYPE=BYTE
+          ]
+  c:\dev\c++\computeremulator\computeremulator\cpu.cpp(90): note: see reference to function template instantiation 'TYPE Cpu::readFromPC<BYTE>(void)' being compiled
+          with
+          [
+              TYPE=BYTE
+          ]
+  main.cpp
+  Generating code
+  1 of 166 functions ( 0.6%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    1 functions had inline decision re-evaluated but remain unchanged
+  Finished generating code
+  ComputerEmulator.vcxproj -> C:\Dev\C++\ComputerEmulator\Release\ComputerEmulator.exe
