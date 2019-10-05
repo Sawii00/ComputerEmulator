@@ -219,9 +219,10 @@ void Cpu::fetch()
 {
 	//decode next instruction
 	//read next instruction from memory at program counter
+	handlePrefixes();
 	BYTE opcode = readFromPC<BYTE>();
 	BYTE mod_rm = readFromPC<BYTE>();
-	curr_instruction = Instruction(opcode << 8 | mod_rm);
+	curr_instruction.setInstruction(opcode << 8 | mod_rm);
 }
 
 void Cpu::execute()
@@ -229,6 +230,66 @@ void Cpu::execute()
 	(m_instruction_list[curr_instruction.getOpCode()].instruction_function)(this);
 }
 //instructions
+
+void Cpu::handlePrefixes()
+{
+	BYTE pref = readBYTE(pc);
+	switch (pref)
+	{
+		//the first prefixes are skipped.
+
+	case 0x2E:
+	{
+		//CS segment override
+		pc++;
+		break;
+	}
+	case 0x36:
+	{
+		//SS segment override
+		pc++;
+		break;
+	}
+	case 0x3E:
+	{
+		//DS segment override
+		pc++;
+		break;
+	}
+	case 0x26:
+	{
+		//ES segment override
+		pc++;
+		break;
+	}
+	case 0x64:
+	{
+		//FS segment override
+		pc++;
+		break;
+	}
+	case 0x65:
+	{
+		//GS segment override
+		pc++;
+		break;
+	}
+	case 0x66:
+	{
+		//operand size override
+		curr_instruction.is_16bit_operand = true;
+		pc++;
+		break;
+	}
+	case 0x67:
+	{
+		//address size override
+		curr_instruction.is_16bit_addressing = true;
+		pc++;
+		break;
+	}
+	}
+}
 
 void Cpu::ADD()
 {

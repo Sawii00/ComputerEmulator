@@ -87,36 +87,35 @@ struct DisassembledInstruction {
 
 struct Instruction {
 	WORD inst;
-
+	bool is_16bit_operand = false;
+	bool is_16bit_addressing = false;
 	Instruction(WORD word = 0)
 		: inst(word) {}
 
+	void setInstruction(WORD w) {
+		inst = w;
+	}
+
 	BYTE getOpCode() const {
 		return inst >> 0xA & 0x3F;
-		//return inst >> 0x2 & 0x3F;
 	}
 
 	BYTE getR_X() const {
 		return inst >> 0x9 & 0x1;
-		//return inst >> 0x1 & 0x1;
 	}
 
 	BYTE getS() const {
 		return inst >> 0x8 & 0x1;
-		//return inst & 0x1;
 	}
 
 	BYTE getMod() const {
 		return inst >> 0x6 & 0x3;
-		//return inst >> 0xE & 0x3;
 	}
 	BYTE getReg() const {
 		return inst >> 0x3 & 0x7;
-		//return inst >> 0xB & 0x7;
 	}
 	BYTE getR_M() const {
 		return inst & 0x7;
-		//return inst >> 0x8 & 0x7;
 	}
 
 	BYTE getOpCodeByte() const {
@@ -159,6 +158,17 @@ struct Instruction {
 
 */
 
+/*
+	This struct encapsulates utility methods for the SIBByte that might follow some instructions
+
+	It is in the form:
+	--|---|---
+	scale|index|base
+
+	The final address will be computed as: index*2^scale + base
+
+*/
+
 struct SIBByte {
 	BYTE  sib;
 
@@ -180,10 +190,14 @@ struct SIBByte {
 class Cpu
 {
 private:
+
+	//pointer to the bus that will hold all the devices inside the emulated computer.
+	//it abstracts useful functions such as read and write to specific addresses on the bus
 	Bus* m_bus = nullptr;
 
 	//REGISTERS
-
+	//Through the usage of unions and structs it is possible to create Addressable Registers so that it's possible
+	//to address the lower WORD, and BYTES of each GP register
 	union {
 		DWORD eax;
 
@@ -313,7 +327,7 @@ private:
 	DWORD pc = 0x00000000; //program counter.
 
 	BYTE flags = 0x00;
-
+	//segment registers
 	WORD cs = 0x0000; //code
 	WORD ds = 0x0000; //data
 	WORD ss = 0x0000; //stack
@@ -326,10 +340,7 @@ private:
 	//////////////////////INTRUCTIONS VARIABLES
 	Instruction curr_instruction;
 
-	bool sib_enabled = false;
-
-	//@TODO
-	//instruction list to be populated
+	//@TODO(sawii): populate instruction list
 	std::array<DisassembledInstruction, 256> m_instruction_list;
 
 public:
@@ -421,6 +432,8 @@ public:
 
 	ReturnCodes writeDWORD(DWORD address, DWORD v);
 
+	void handlePrefixes();
+
 	DWORD handleSIBInstruction();
 
 	template<typename T>
@@ -428,6 +441,7 @@ public:
 	{
 		//if desperate for efficiency, we can try to use the array trick for the other switch cases by using a lambda for each
 		//	case and create an array of std::function that can hold them... NOT SURE IT IMPROVES
+		//it works but somehow in release mod it breaks... probably some hard optimizations
 
 		if (sizeof(T) == 1) {
 			//8 bit instructions
