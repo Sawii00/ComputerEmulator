@@ -1,5 +1,7 @@
 /.vs
 /Debug
+/Release
+ComputerEmulator/Release
 ComputerEmulator.sln
 ComputerEmulator/Debug
 ComputerEmulator/ComputerEmulator.*
