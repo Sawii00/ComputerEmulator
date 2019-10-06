@@ -94,111 +94,20 @@ DWORD Cpu::handleSIBInstruction()
 		DWORD final_address = 0x00;
 
 		BYTE index = sib.getIndex();
-		switch (index)
-		{
-		case 0x00:
-		{
-			final_address = eax;
-			break;
-		}
-		case 0x01:
-		{
-			final_address = ecx;
+		if (index == 0x4 || index < 0 || index >= 8)throw "Invalid SIB BYTE";
+		DWORD regs[8] = { eax, ecx, edx, ebx, esp, ebp, esi, edi };
 
-			break;
-		}
-		case 0x02:
-		{
-			final_address = edx;
-
-			break;
-		}
-		case 0x03:
-		{
-			final_address = ebx;
-
-			break;
-		}
-		case 0x04:
-		{
-			break;
-		}
-		case 0x05:
-		{
-			final_address = ebp;
-
-			break;
-		}
-		case 0x06:
-		{
-			final_address = esi;
-
-			break;
-		}
-		case 0x07:
-		{
-			final_address = edi;
-
-			break;
-		}
-		default:
-			throw "Invalid Index";
-		}
+		final_address = regs[index];
 
 		final_address = final_address << scale;
 
 		BYTE base = sib.getBase();
-		switch (base)
-		{
-		case 0x00:
-		{
-			final_address += eax;
-			break;
-		}
-		case 0x01:
-		{
-			final_address += ecx;
 
-			break;
+		if (!curr_instruction.getMod() && base == 0x5) {
+			regs[0x5] = readFromPC<DWORD>();
 		}
-		case 0x02:
-		{
-			final_address += edx;
-
-			break;
-		}
-		case 0x03:
-		{
-			final_address += ebx;
-
-			break;
-		}
-		case 0x04:
-		{
-			final_address += esp;
-		}
-		case 0x05:
-		{
-			//TODO(important): fix this according to the correct intel guidelines
-			final_address += ebp;
-
-			break;
-		}
-		case 0x06:
-		{
-			final_address += esi;
-
-			break;
-		}
-		case 0x07:
-		{
-			final_address += edi;
-
-			break;
-		}
-		default:
-			throw "Invalid Index";
-		}
+		if (base < 0 || base >= 8)throw "Invalid SIB BYTE";
+		final_address += regs[base];
 
 		return final_address;
 	}

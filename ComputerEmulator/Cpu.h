@@ -21,8 +21,7 @@ http://www.c-jump.com/CIS77/CPU/x86/lecture.html
 */
 /*
 @TODO:
-	- fix handleSIBInstruction (deal with case 0x05 of base appropriately)
-	- refactor handleSIBInstruction with array
+	- refactor throws with ASSERT
 
 	- implement 8 bit instruction decoder
 	- implement prefixes and 16 bit instruction decoder
