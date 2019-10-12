@@ -11,7 +11,7 @@ Cpu::Cpu()
 	edi = 0x00;
 	esp = 0x00;
 	ebp = 0x00;
-
+    
 	m_instruction_list[0] = DisassembledInstruction(std::string("ADD"), &Cpu::ADD, (BYTE)1);
 }
 
@@ -88,27 +88,27 @@ DWORD Cpu::handleSIBInstruction()
 {
 	{
 		SIBByte sib(readFromPC<BYTE>());
-
+        
 		BYTE scale = sib.getScale();
-
+        
 		DWORD final_address = 0x00;
-
+        
 		BYTE index = sib.getIndex();
 		if (index == 0x4 || index < 0 || index >= 8)throw "Invalid SIB BYTE";
 		DWORD regs[8] = { eax, ecx, edx, ebx, esp, ebp, esi, edi };
-
+        
 		final_address = regs[index];
-
+        
 		final_address = final_address << scale;
-
+        
 		BYTE base = sib.getBase();
-
+        
 		if (!curr_instruction.getMod() && base == 0x5) {
 			regs[0x5] = readFromPC<DWORD>();
 		}
 		if (base < 0 || base >= 8)throw "Invalid SIB BYTE";
 		final_address += regs[base];
-
+        
 		return final_address;
 	}
 }
@@ -146,57 +146,56 @@ void Cpu::handlePrefixes()
 	switch (pref)
 	{
 		//the first prefixes are skipped.
-
-	case 0x2E:
-	{
-		//CS segment override
-		pc++;
-		break;
-	}
-	case 0x36:
-	{
-		//SS segment override
-		pc++;
-		break;
-	}
-	case 0x3E:
-	{
-		//DS segment override
-		pc++;
-		break;
-	}
-	case 0x26:
-	{
-		//ES segment override
-		pc++;
-		break;
-	}
-	case 0x64:
-	{
-		//FS segment override
-		pc++;
-		break;
-	}
-	case 0x65:
-	{
-		//GS segment override
-		pc++;
-		break;
-	}
-	case 0x66:
-	{
-		//operand size override
-		curr_instruction.is_16bit_operand = true;
-		pc++;
-		break;
-	}
-	case 0x67:
-	{
-		//address size override
-		curr_instruction.is_16bit_addressing = true;
-		pc++;
-		break;
-	}
+        case 0x2E:
+        {
+            //CS segment override
+            pc++;
+            break;
+        }
+        case 0x36:
+        {
+            //SS segment override
+            pc++;
+            break;
+        }
+        case 0x3E:
+        {
+            //DS segment override
+            pc++;
+            break;
+        }
+        case 0x26:
+        {
+            //ES segment override
+            pc++;
+            break;
+        }
+        case 0x64:
+        {
+            //FS segment override
+            pc++;
+            break;
+        }
+        case 0x65:
+        {
+            //GS segment override
+            pc++;
+            break;
+        }
+        case 0x66:
+        {
+            //operand size override
+            curr_instruction.is_16bit_operand = true;
+            pc++;
+            break;
+        }
+        case 0x67:
+        {
+            //address size override
+            curr_instruction.is_16bit_addressing = true;
+            pc++;
+            break;
+        }
 	}
 }
 
@@ -205,12 +204,12 @@ void Cpu::ADD()
 	if (curr_instruction.getS()) {
 		//32-16 bit
 		//@TODO(sawii) check if its 16 via prefixes
-
+        
 		DWORD* first = nullptr;
 		DWORD* second = nullptr;
-
+        
 		handleModRM<DWORD>(first, second);
-
+        
 		if (!curr_instruction.getR_X()) {
 			*second += *first;
 		}
@@ -220,10 +219,10 @@ void Cpu::ADD()
 	}
 	else {
 		//8 bit
-
+        
 		BYTE* first = nullptr;
 		BYTE* second = nullptr;
-
+        
 		handleModRM<BYTE>(first, second);
 		if (!curr_instruction.getR_X()) {
 			*second += *first;
